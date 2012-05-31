@@ -38,7 +38,6 @@ describe "Migration " do
 
       class AddName < Migration
         on_database 'foobar'
-        over_view 'foobar/all'
 
         up do
           add 'name', 'atilla'
@@ -48,10 +47,14 @@ describe "Migration " do
       Migrator.run AddName
     end
 
-    it "should add name field to all docs" do
+    it "should add name field to all created docs" do
       [@doc1, @doc2, @doc3].each do |doc|
         @db.get(doc['id'])['name'].should == 'atilla'
       end
+    end
+
+    it "should add name field to design doc also" do
+      @db.get('_design/foobar')['name'].should == 'atilla'
     end
   end
 

@@ -1,10 +1,15 @@
 class Migrator
 
   def self.run migration
-    rdocs = migration.db.view(migration.view_name)['rows']
+    if migration.view_name == nil
+      rdocs = migration.db.all_docs('include_docs' => 'true')['rows']
+    else
+      rdocs = migration.db.view(migration.view_name)['rows']
+    end
+
     docs = []
     rdocs.each do |rdoc|
-      doc = rdoc["value"]
+      doc = (migration.view_name == nil)? rdoc['doc'] : rdoc['value']
       migration.operations.each do |op|
         doc = op.execute doc
       end
