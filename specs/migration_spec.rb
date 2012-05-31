@@ -44,6 +44,7 @@ describe "Migration " do
 
         up do
           add 'name', 'atilla'
+          add 'occupation', 'warrior'
         end
       end
 
@@ -53,6 +54,7 @@ describe "Migration " do
     it "should add name field to all created docs" do
       [@doc1, @doc2, @doc3].each do |doc|
         @db.get(doc['id'])['name'].should == 'atilla'
+        @db.get(doc['id'])['occupation'].should == 'warrior'
       end
     end
 
