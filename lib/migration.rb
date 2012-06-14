@@ -1,10 +1,11 @@
 require 'couchrest'
 require 'add'
+require 'remove'
 
 class Migration
 
   def self.on_database name
-    @db = CouchRest.database "http://127.0.0.1:5984/#{name}"
+    @foobar = CouchRest.database "http://127.0.0.1:5984/#{name}"
   end
 
   def self.over_scope name, query_params = {}
@@ -13,12 +14,13 @@ class Migration
   end
 
   def self.up
-    @operations = []
+    @up_operations = []
+    @current_operations = @up_operations
     yield
   end
 
   def self.db
-    @db
+    @foobar
   end
 
   def self.view_name
@@ -29,11 +31,15 @@ class Migration
     @query_params
   end
 
-  def self.operations
-    @operations
+  def self.up_operations
+    @up_operations
   end
 
   def self.add field, value
-    @operations << Add.new(field, value)
+    @current_operations << Add.new(field, value)
+  end
+
+  def self.remove field
+    @current_operations << Remove.new(field)
   end
 end

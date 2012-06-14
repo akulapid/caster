@@ -10,7 +10,7 @@ class Migrator
     docs = []
     rdocs.each do |rdoc|
       doc = (migration.view_name == nil)? rdoc['doc'] : rdoc['value']
-      migration.operations.each do |op|
+      migration.up_operations.each do |op|
         doc = op.execute doc
       end
       docs << doc

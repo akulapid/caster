@@ -8,9 +8,9 @@ require 'couchrest'
 describe "Migration " do
 
   before do
-    @db = CouchRest.database! 'http://127.0.0.1:5984/foobar'
+    @foobar = CouchRest.database! 'http://127.0.0.1:5984/foobar'
 
-    @db.save_doc({
+    @foobar.save_doc({
       '_id' => '_design/foobar',
       :views => {
         #:all => {
@@ -30,14 +30,14 @@ describe "Migration " do
   end
 
   after do
-    @db.delete!
+    @foobar.delete!
   end
 
   describe 'add field: ' do
     before do
-      @doc1 = @db.save_doc({})
-      @doc2 = @db.save_doc({})
-      @doc3 = @db.save_doc({})
+      @doc1 = @foobar.save_doc({})
+      @doc2 = @foobar.save_doc({})
+      @doc3 = @foobar.save_doc({})
 
       class AddName < Migration
         on_database 'foobar'
@@ -53,20 +53,20 @@ describe "Migration " do
 
     it "should add name field to all created docs" do
       [@doc1, @doc2, @doc3].each do |doc|
-        @db.get(doc['id'])['name'].should == 'atilla'
-        @db.get(doc['id'])['occupation'].should == 'warrior'
+        @foobar.get(doc['id'])['name'].should == 'atilla'
+        @foobar.get(doc['id'])['occupation'].should == 'warrior'
       end
     end
 
     it "should add name field to design doc also" do
-      @db.get('_design/foobar')['name'].should == 'atilla'
+      @foobar.get('_design/foobar')['name'].should == 'atilla'
     end
   end
 
   describe 'view scope: ' do
     before do
-      @foo_type = @db.save_doc({ 'type' => 'foo' })
-      @fuu_type = @db.save_doc({ 'type' => 'fuu' })
+      @foo_type = @foobar.save_doc({ 'type' => 'foo' })
+      @fuu_type = @foobar.save_doc({ 'type' => 'fuu' })
 
       class AddNameToFoo < Migration
         on_database 'foobar'
@@ -80,19 +80,19 @@ describe "Migration " do
     end
 
     it "should add name field to view all_foo" do
-      @db.get(@foo_type['id'])['name'].should == 'atilla'
+      @foobar.get(@foo_type['id'])['name'].should == 'atilla'
     end
 
     it "should not add name field to view all_fuu" do
-      @db.get(@fuu_type['id'])['name'].should == nil
+      @foobar.get(@fuu_type['id'])['name'].should == nil
     end
   end
 
   describe 'query scope: ' do
     before do
-      @foo_loc1 = @db.save_doc({ 'loc' => 'foo' })
-      @foo_loc2 = @db.save_doc({ 'loc' => 'foo' })
-      @fuu_loc = @db.save_doc({ 'loc' => 'fuu' })
+      @foo_loc1 = @foobar.save_doc({ 'loc' => 'foo' })
+      @foo_loc2 = @foobar.save_doc({ 'loc' => 'foo' })
+      @fuu_loc = @foobar.save_doc({ 'loc' => 'fuu' })
 
       class AddNameToFoo < Migration
         on_database 'foobar'
@@ -106,12 +106,38 @@ describe "Migration " do
     end
 
     it "should add name field to all docs with loc = foo" do
-      @db.get(@foo_loc1['id'])['name'].should == 'atilla'
-      @db.get(@foo_loc2['id'])['name'].should == 'atilla'
+      @foobar.get(@foo_loc1['id'])['name'].should == 'atilla'
+      @foobar.get(@foo_loc2['id'])['name'].should == 'atilla'
     end
 
     it "should not add name field to doc with loc != foo" do
-      @db.get(@fuu_loc['id'])['name'].should == nil
+      @foobar.get(@fuu_loc['id'])['name'].should == nil
     end
   end
+
+  describe 'remove field: ' do
+    before do
+      @doc1 = @foobar.save_doc({ "type" => "foo", "name" => "carman", "state" => "on" })
+      @doc2 = @foobar.save_doc({ "type" => "foo", "name" => "fifo" })
+      @doc3 = @foobar.save_doc({ "type" => "foo" })
+
+      class RemoveName < Migration
+        on_database 'foobar'
+        over_scope 'foobar/all_foo'
+
+        up do
+          remove 'name'
+        end
+      end
+
+      Migrator.run RemoveName
+    end
+
+    it "should remove name field from all docs" do
+      [@doc1, @doc2, @doc3].each do |doc|
+        @foobar.get(doc['id'])['name'].should == nil
+      end
+    end
+  end
+
 end
