@@ -1,6 +1,7 @@
 require 'scope'
 require 'add'
 require 'remove'
+require 'rename'
 
 class Migration
 
@@ -29,5 +30,9 @@ class Migration
 
   def self.remove field
     @current_scopes.last.add_operation(Remove.new(field))
+  end
+
+  def self.rename old_name, new_name
+    @current_scopes.last.add_operation(Rename.new(old_name, new_name))
   end
 end
