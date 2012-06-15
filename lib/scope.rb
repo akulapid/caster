@@ -15,15 +15,10 @@ class Scope
   end
 
   def execute
-    if @view == nil
-      rdocs = @db.all_docs('include_docs' => 'true')['rows']
-    else
-      rdocs = @db.view(@view, @query)['rows']
-    end
-
+    rdocs = @db.view(@view, @query)['rows']
     docs = []
     rdocs.each do |rdoc|
-      doc = (@view == nil)? rdoc['doc'] : rdoc['value']
+      doc = rdoc['value']
       @operations.each do |op|
         doc = op.execute doc
       end
