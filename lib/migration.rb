@@ -2,6 +2,7 @@ require 'scope'
 require 'op/add'
 require 'op/remove'
 require 'op/rename'
+require 'query'
 
 class Migration
 
@@ -24,8 +25,16 @@ class Migration
     yield
   end
 
+  def self.query scope, query = {}
+    Query.new @database_name, scope, query
+  end
+
   def self.add field, value
     @current_scopes.last.add_operation(Add.new(field, value))
+  end
+
+  class << self
+    alias_method :update, :add
   end
 
   def self.remove field
