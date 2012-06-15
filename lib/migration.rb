@@ -1,7 +1,7 @@
 require 'scope'
-require 'add'
-require 'remove'
-require 'rename'
+require 'op/add'
+require 'op/remove'
+require 'op/rename'
 
 class Migration
 

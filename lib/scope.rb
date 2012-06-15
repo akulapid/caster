@@ -1,5 +1,6 @@
 require 'couchrest'
 
+# defines an execution scope which is a set of documents over which migration operations run
 class Scope
 
   def initialize database_name, view, query
