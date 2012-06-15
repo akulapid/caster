@@ -15,7 +15,7 @@ class Migration
     yield
   end
 
-  def self.up_executions
+  def self.up_scopes
     @up_scopes
   end
 
