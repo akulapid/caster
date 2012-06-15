@@ -1,1 +1,3 @@
 parameterize database for query
+
+refer target_doc just like querying other doc types
