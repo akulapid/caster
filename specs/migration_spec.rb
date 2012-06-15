@@ -13,9 +13,9 @@ describe "Migration " do
     @foobar.save_doc({
       '_id' => '_design/foobar',
       :views => {
-        #:all => {
-        #  :map => "function(doc) { emit(doc._id, doc); }"
-        #},
+        :all => {
+          :map => "function(doc) { emit (doc._id, doc); }"
+        },
         :all_foo => {
           :map => "function(doc) { if (doc.type == 'foo') emit (doc._id, doc); }"
         },
@@ -39,27 +39,24 @@ describe "Migration " do
       @doc2 = @foobar.save_doc({})
       @doc3 = @foobar.save_doc({})
 
-      class AddName < Migration
+      class AddNameAndOccupation < Migration
         on_database 'foobar'
 
         up do
-          add 'name', 'atilla'
-          add 'occupation', 'warrior'
+          over_scope 'foobar/all' do
+            add 'name', 'atilla'
+            add 'occupation', 'warrior'
+          end
         end
       end
-
-      Migrator.run AddName
+      Migrator.run AddNameAndOccupation
     end
 
-    it "should add name field to all created docs" do
+    it "should add name and occupation fields to all created docs" do
       [@doc1, @doc2, @doc3].each do |doc|
         @foobar.get(doc['id'])['name'].should == 'atilla'
         @foobar.get(doc['id'])['occupation'].should == 'warrior'
       end
-    end
-
-    it "should add name field to design doc also" do
-      @foobar.get('_design/foobar')['name'].should == 'atilla'
     end
   end
 
@@ -70,10 +67,11 @@ describe "Migration " do
 
       class AddNameToFoo < Migration
         on_database 'foobar'
-        over_scope 'foobar/all_foo'
 
         up do
-          add 'name', 'atilla'
+          over_scope 'foobar/all_foo' do
+            add 'name', 'atilla'
+          end
         end
       end
       Migrator.run AddNameToFoo
@@ -96,10 +94,11 @@ describe "Migration " do
 
       class AddNameToFoo < Migration
         on_database 'foobar'
-        over_scope 'foobar/by_loc', { 'key' => 'foo' }
 
         up do
-          add 'name', 'atilla'
+          over_scope 'foobar/by_loc', { 'key' => 'foo' } do
+            add 'name', 'atilla'
+          end
         end
       end
       Migrator.run AddNameToFoo
@@ -123,13 +122,13 @@ describe "Migration " do
 
       class RemoveName < Migration
         on_database 'foobar'
-        over_scope 'foobar/all_foo'
 
         up do
-          remove 'name'
+          over_scope 'foobar/all_foo' do
+            remove 'name'
+          end
         end
       end
-
       Migrator.run RemoveName
     end
 
@@ -139,5 +138,4 @@ describe "Migration " do
       end
     end
   end
-
 end
