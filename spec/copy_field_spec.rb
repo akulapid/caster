@@ -76,3 +76,24 @@ describe 'copy field where the target field is linked by a field nested deep ins
     @foobar.get(@foo_doc['id'])['name'].should == 'attila'
   end
 end
+
+describe 'copy field from another field within the same document: ' do
+  before do
+    @doc = @foobar.save_doc({ 'type' => 'foo', 'stats' => { 'score' => 5 }})
+
+    class UpdateName < Migration
+      on_database 'foobar'
+
+      up do
+        over_scope 'foobar/all_foo' do
+          add 'victories', field('stats.score')
+        end
+      end
+    end
+    Migrator.run UpdateName
+  end
+
+  it "should retrieve and add name" do
+    @foobar.get(@doc['id'])['victories'].should == 5
+  end
+end

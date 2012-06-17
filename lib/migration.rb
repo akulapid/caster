@@ -2,7 +2,8 @@ require 'scope'
 require 'op/add'
 require 'op/remove'
 require 'op/rename'
-require 'query'
+require 'ref/cross_reference'
+require 'ref/self_reference'
 
 class Migration
 
@@ -26,7 +27,11 @@ class Migration
   end
 
   def self.query scope, query = {}
-    Query.new @database_name, scope, query
+    CrossReference.new @database_name, scope, query
+  end
+
+  def self.field accessor
+    SelfReference.new accessor
   end
 
   def self.add field, value

@@ -13,6 +13,6 @@ class Add
   end
 
   def evaluate obj, target_doc
-    (obj.class == Query)? obj.execute(target_doc) : obj
+    (obj.is_a? Reference)? obj.execute(target_doc) : obj
   end
 end

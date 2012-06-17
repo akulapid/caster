@@ -1,6 +1,7 @@
 require 'couchrest'
+require 'ref/reference'
 
-class Query
+class CrossReference < Reference
 
   def initialize database, view, query
     db = CouchRest.database "http://127.0.0.1:5984/#{database}"
@@ -26,10 +27,5 @@ class Query
       end
     end
     nil
-  end
-
-  private
-  def access_field doc, accessor
-    eval 'doc' << accessor.split('.').map { |field| "['#{field}']" }.to_s
   end
 end
