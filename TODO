@@ -1,3 +1,1 @@
-parameterize database for query
-
-refer target_doc just like querying other doc types
+parameterize database for query - should do this once create_doc option is present
