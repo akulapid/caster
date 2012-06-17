@@ -1,7 +1,4 @@
 require 'spec_helper'
-require 'migration'
-require 'migrator'
-require 'couchrest'
 
 describe 'add field: ' do
   before do

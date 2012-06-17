@@ -1,7 +1,4 @@
 require 'spec_helper'
-require 'migration'
-require 'migrator'
-require 'couchrest'
 
 describe 'copy field from one doc type to another: ' do
   before do
