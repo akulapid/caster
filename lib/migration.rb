@@ -2,6 +2,7 @@ require 'scope'
 require 'op/add'
 require 'op/remove'
 require 'op/rename'
+require 'op/create'
 require 'ref/cross_reference'
 require 'ref/self_reference'
 
@@ -48,5 +49,9 @@ class Migration
 
   def self.rename old_name, new_name
     @current_scopes.last.add_operation(Rename.new(old_name, new_name))
+  end
+
+  def self.create params
+    @current_scopes.last.add_operation(Create.new(params))
   end
 end
