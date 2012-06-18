@@ -3,6 +3,7 @@ require 'op/add'
 require 'op/remove'
 require 'op/rename'
 require 'op/create'
+require 'op/delete'
 require 'ref/cross_reference'
 require 'ref/self_reference'
 
@@ -53,5 +54,9 @@ class Migration
 
   def self.create params
     @current_scopes.last.add_operation(Create.new(params))
+  end
+
+  def self.delete
+    @current_scopes.last.add_operation(Delete.new)
   end
 end
