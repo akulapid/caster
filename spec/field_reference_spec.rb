@@ -84,3 +84,47 @@ describe 'copy field where the target field is linked by a field nested deep ins
     @foobar.get(@foo_doc['id'])['name'].should == 'attila'
   end
 end
+
+describe 'copy entire document into a field: ' do
+  before do
+    @foo_doc = @foobar.save_doc({ 'type' => 'foo' })
+    @fuu_doc = @foobar.save_doc({ 'type' => 'fuu', 'name' => 'attila', 'foo_id' => @foo_doc['id'] })
+
+    class CopyName < Migration
+      on_database 'foobar'
+
+      up do
+        over_scope 'foobar/all_foo' do
+          add 'fuu', query('foobar/all_fuu').linked_by('foo_id')
+        end
+      end
+    end
+    Migrator.run CopyName
+  end
+
+  it "should retrieve and add name" do
+    @foobar.get(@foo_doc['id'])['fuu'].should == @foobar.get(@fuu_doc['id'])
+  end
+end
+
+describe 'copy current document itself into a field (not real use case, keeping for syntax purposes): ' do
+  before do
+    @foo_doc = @foobar.save_doc({ 'type' => 'foo', 'name' => 'attila' })
+    @expected_doc = @foobar.get(@foo_doc['id'])
+
+    class CopyName < Migration
+      on_database 'foobar'
+
+      up do
+        over_scope 'foobar/all_foo' do
+          add 'fuu', doc
+        end
+      end
+    end
+    Migrator.run CopyName
+  end
+
+  it "should retrieve and add name" do
+    @foobar.get(@foo_doc['id'])['fuu'].should == @expected_doc
+  end
+end

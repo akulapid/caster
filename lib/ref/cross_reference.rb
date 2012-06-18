@@ -23,7 +23,7 @@ class CrossReference < Reference
   def execute target_doc
     @docs.each do |doc|
       if access_field(doc, @linked_field) == target_doc['_id']
-        return access_field(doc, @value_field)
+        return (@value_field == nil)? doc : access_field(doc, @value_field)
       end
     end
     nil

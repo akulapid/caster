@@ -7,6 +7,6 @@ class SelfReference < Reference
   end
 
   def execute target_doc
-    access_field(target_doc, @accessor)
+    (@accessor == nil)? target_doc.clone : access_field(target_doc, @accessor)
   end
 end

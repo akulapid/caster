@@ -44,7 +44,7 @@ class Execution
     CrossReference.new @database_name, scope, query
   end
 
-  def doc accessor
+  def doc accessor = nil
     SelfReference.new accessor
   end
 
