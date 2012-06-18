@@ -8,7 +8,7 @@ require 'ref/cross_reference'
 require 'ref/self_reference'
 
 # defines an execution scope which is a set of documents over which migration operations run
-class Scope
+class Execution
 
   def initialize database_name, view, query, &block
     @database_name = database_name
@@ -44,7 +44,7 @@ class Scope
     CrossReference.new @database_name, scope, query
   end
 
-  def field accessor
+  def doc accessor
     SelfReference.new accessor
   end
 

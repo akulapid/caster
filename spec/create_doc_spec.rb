@@ -10,7 +10,7 @@ describe 'create doc: ' do
 
       up do
         over_scope 'foobar/all_foo' do
-          create({ 'type' => 'fuu', 'title' => field('name') })
+          create({ 'type' => 'fuu', 'title' => doc('name') })
         end
       end
     end

@@ -9,8 +9,8 @@ describe 'refer field within the same document: ' do
 
       up do
         over_scope 'foobar/all_foo' do
-          add 'title', field('name')
-          add 'victories', field('stats.score')
+          add 'title', doc('name')
+          add 'victories', doc('stats.score')
         end
       end
     end

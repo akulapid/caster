@@ -1,4 +1,4 @@
-require 'scope'
+require 'execution'
 
 class Migration
 
@@ -7,16 +7,16 @@ class Migration
   end
 
   def self.up
-    @up_scopes = []
-    @current_scopes = @up_scopes
+    @up_executions = []
+    @current_executions = @up_executions
     yield
   end
 
-  def self.up_scopes
-    @up_scopes
+  def self.up_executions
+    @up_executions
   end
 
   def self.over_scope view, query = {}, &block
-    @current_scopes << Scope.new(@database_name, view, query, &block)
+    @current_executions << Execution.new(@database_name, view, query, &block)
   end
 end
