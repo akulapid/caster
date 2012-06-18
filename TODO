@@ -1,5 +1,3 @@
 parameterize database for query - should do this once create_doc option is present
 
 add spec to clone a db
-
-add spec to write 2 executions in an up block
