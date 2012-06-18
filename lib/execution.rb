@@ -1,9 +1,11 @@
 require 'couchrest'
-require 'op/add'
-require 'op/remove'
-require 'op/rename'
-require 'op/create'
-require 'op/delete'
+require 'operation'
+require 'transform/add'
+require 'transform/remove'
+require 'transform/rename'
+require 'transform/create'
+require 'transform/delete'
+require 'transform/clone'
 require 'ref/cross_reference'
 require 'ref/self_reference'
 
@@ -20,24 +22,28 @@ class Execution
   end
 
   def add field, value
-    @operations << Add.new(field, value)
+    @operations << Operation.new(@db, Add.new(field, value))
   end
   alias_method :update, :add
 
   def remove field
-    @operations << Remove.new(field)
+    @operations << Operation.new(@db, Remove.new(field))
   end
 
   def rename old_name, new_name
-    @operations << Rename.new(old_name, new_name)
+    @operations << Operation.new(@db, Rename.new(old_name, new_name))
   end
 
   def create params
-    @operations << Create.new(params)
+    @operations << Operation.new(@db, Create.new(params))
   end
 
   def delete
-    @operations << Delete.new
+    @operations << Operation.new(@db, Delete.new)
+  end
+
+  def create_on database_name, params
+    @operations << Operation.new(CouchRest.database("http://127.0.0.1:5984/#{database_name}"), Clone.new(params))
   end
 
   def query scope, query = {}
@@ -50,14 +56,15 @@ class Execution
 
   def execute
     rdocs = @db.view(@view, @query)['rows']
-    docs = []
+    db_docs_map = Hash.new { |k, v| k[v] = [] }
     rdocs.each do |rdoc|
       doc = rdoc['value']
       @operations.each do |op|
-        doc = op.execute doc
+        db_docs_map[op.db_handle] << op.transformation.execute(doc)
       end
-      docs << doc
     end
-    @db.bulk_save docs
-  end  
+    db_docs_map.each do |db, docs|
+      db.bulk_save docs
+    end
+  end
 end
