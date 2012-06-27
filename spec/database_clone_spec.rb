@@ -2,15 +2,16 @@ require 'spec_helper'
 
 describe 'copy documents between databases: ' do
   before do
-    @fuubar = CouchRest.database! 'http://127.0.0.1:5984/fuubar'
     @doc1 = @foobar.save_doc({ 'type' => 'foo' })
+    @fuubar = CouchRest.database! 'http://127.0.0.1:5984/fuubar'
 
     class CloneDatabase < Migration
       on_database 'foobar'
+      fuubar = CouchRest.database! 'http://127.0.0.1:5984/fuubar'
 
       up do
         over_scope 'foobar/all_foo' do
-          create_on('fuubar', doc)
+          create_on(fuubar, doc)
         end
       end
     end

@@ -3,9 +3,8 @@ require 'ref/reference'
 
 class CrossReference < Reference
 
-  def initialize database, view, query
-    db = CouchRest.database "http://127.0.0.1:5984/#{database}"
-    rdocs = db.view(view, query)['rows']
+  def initialize db_handle, view, query
+    rdocs = db_handle.view(view, query)['rows']
     @docs = rdocs.map { |rdoc| rdoc['value'] }
     self
   end
