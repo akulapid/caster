@@ -6,7 +6,7 @@ describe 'remove field: ' do
     @doc2 = @foobar.save_doc({ "type" => "foo", "name" => "fifo" })
     @doc3 = @foobar.save_doc({ "type" => "foo" })
 
-    class RemoveName < Migration
+    class RemoveName < Caster::Migration
       on_database 'foobar'
 
       up do
@@ -15,7 +15,7 @@ describe 'remove field: ' do
         end
       end
     end
-    Migrator.run RemoveName
+    Caster::Migrator.run RemoveName
   end
 
   it "should remove name field from all docs" do

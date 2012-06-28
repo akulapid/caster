@@ -5,7 +5,7 @@ describe 'update field: ' do
     @doc1 = @foobar.save_doc({ 'type' => 'foo', 'score' => '43' })
     @doc2 = @foobar.save_doc({ 'type' => 'foo', 'score' => '13' })
 
-    class UpdateScore < Migration
+    class UpdateScore < Caster::Migration
       on_database 'foobar'
 
       up do
@@ -14,7 +14,7 @@ describe 'update field: ' do
         end
       end
     end
-    Migrator.run UpdateScore
+    Caster::Migrator.run UpdateScore
   end
 
   it "should reset score of all foos" do

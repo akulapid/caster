@@ -6,7 +6,7 @@ describe 'view scope: ' do
     @fuu_type = @foobar.save_doc({ 'type' => 'fuu' })
     @fii_type = @foobar.save_doc({ 'type' => 'fii' })
 
-    class AddNameToFoo < Migration
+    class AddNameToFoo < Caster::Migration
       on_database 'foobar'
 
       up do
@@ -19,7 +19,7 @@ describe 'view scope: ' do
         end
       end
     end
-    Migrator.run AddNameToFoo
+    Caster::Migrator.run AddNameToFoo
   end
 
   it "should add name field to view all_foo" do

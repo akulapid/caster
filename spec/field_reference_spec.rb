@@ -4,7 +4,7 @@ describe 'refer field within the same document: ' do
   before do
     @doc = @foobar.save_doc({ 'type' => 'foo', 'name' => 'attila', 'stats' => { 'score' => 5 }})
 
-    class UpdateName < Migration
+    class UpdateName < Caster::Migration
       on_database 'foobar'
 
       up do
@@ -14,7 +14,7 @@ describe 'refer field within the same document: ' do
         end
       end
     end
-    Migrator.run UpdateName
+    Caster::Migrator.run UpdateName
   end
 
   it "should refer and add name" do
@@ -34,7 +34,7 @@ describe 'refer field from another doc type: ' do
     @fuu_doc1 = @foobar.save_doc({ 'type' => 'fuu', 'name' => 'attila', 'stats' => { 'score' => 5 }, 'foo_id' => @foo_doc1['id'] })
     @fuu_doc2 = @foobar.save_doc({ 'type' => 'fuu', 'name' => 'genghis', 'stats' => { 'score' => 8 }, 'foo_id' => @foo_doc2['id'] })
 
-    class CopyName < Migration
+    class CopyName < Caster::Migration
       on_database 'foobar'
 
       up do
@@ -44,7 +44,7 @@ describe 'refer field from another doc type: ' do
         end
       end
     end
-    Migrator.run CopyName
+    Caster::Migrator.run CopyName
   end
 
   it "should add name to all foos from their respective fuus" do
@@ -68,7 +68,7 @@ describe 'copy field where the target field is linked by a field nested deep ins
     @foo_doc = @foobar.save_doc({ 'type' => 'foo' })
     @fuu_doc = @foobar.save_doc({ 'type' => 'fuu', 'name' => 'attila', 'foo' => { 'id' => @foo_doc['id'] }})
 
-    class CopyName < Migration
+    class CopyName < Caster::Migration
       on_database 'foobar'
 
       up do
@@ -77,7 +77,7 @@ describe 'copy field where the target field is linked by a field nested deep ins
         end
       end
     end
-    Migrator.run CopyName
+    Caster::Migrator.run CopyName
   end
 
   it "should retrieve and add name" do
@@ -90,7 +90,7 @@ describe 'copy entire document into a field: ' do
     @foo_doc = @foobar.save_doc({ 'type' => 'foo' })
     @fuu_doc = @foobar.save_doc({ 'type' => 'fuu', 'name' => 'attila', 'foo_id' => @foo_doc['id'] })
 
-    class CopyName < Migration
+    class CopyName < Caster::Migration
       on_database 'foobar'
 
       up do
@@ -99,7 +99,7 @@ describe 'copy entire document into a field: ' do
         end
       end
     end
-    Migrator.run CopyName
+    Caster::Migrator.run CopyName
   end
 
   it "should retrieve and add name" do
@@ -112,7 +112,7 @@ describe 'copy current document itself into a field (not real use case, keeping 
     @foo_doc = @foobar.save_doc({ 'type' => 'foo', 'name' => 'attila' })
     @expected_doc = @foobar.get(@foo_doc['id'])
 
-    class CopyName < Migration
+    class CopyName < Caster::Migration
       on_database 'foobar'
 
       up do
@@ -121,7 +121,7 @@ describe 'copy current document itself into a field (not real use case, keeping 
         end
       end
     end
-    Migrator.run CopyName
+    Caster::Migrator.run CopyName
   end
 
   it "should retrieve and add name" do

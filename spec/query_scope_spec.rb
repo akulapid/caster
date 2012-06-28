@@ -6,7 +6,7 @@ describe 'query scope: ' do
     @foo_loc2 = @foobar.save_doc({ 'loc' => 'foo' })
     @fuu_loc = @foobar.save_doc({ 'loc' => 'fuu' })
 
-    class AddNameToFoo < Migration
+    class AddNameToFoo < Caster::Migration
       on_database 'foobar'
 
       up do
@@ -15,7 +15,7 @@ describe 'query scope: ' do
         end
       end
     end
-    Migrator.run AddNameToFoo
+    Caster::Migrator.run AddNameToFoo
   end
 
   it "should add name field to all docs with loc = foo" do

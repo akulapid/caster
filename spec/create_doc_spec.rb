@@ -5,7 +5,7 @@ describe 'create doc: ' do
     @doc1 = @foobar.save_doc({ 'type' => 'foo', 'name' => 'attila' })
     @doc2 = @foobar.save_doc({ 'type' => 'foo', 'name' => 'genghis' })
 
-    class CreateDoc < Migration
+    class CreateDoc < Caster::Migration
       on_database 'foobar'
 
       up do
@@ -14,7 +14,7 @@ describe 'create doc: ' do
         end
       end
     end
-    Migrator.run CreateDoc
+    Caster::Migrator.run CreateDoc
   end
 
   it "should create a fuu for each foo" do

@@ -4,7 +4,7 @@ describe 'rename field: ' do
   before do
     @doc = @foobar.save_doc({ "type" => "foo", "name" => "carman" })
 
-    class RenameName < Migration
+    class RenameName < Caster::Migration
       on_database 'foobar'
 
       up do
@@ -13,7 +13,7 @@ describe 'rename field: ' do
         end
       end
     end
-    Migrator.run RenameName
+    Caster::Migrator.run RenameName
   end
 
   it "should remove name field from all docs" do

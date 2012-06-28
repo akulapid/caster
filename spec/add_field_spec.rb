@@ -6,7 +6,7 @@ describe 'add field: ' do
     @doc2 = @foobar.save_doc({})
     @doc3 = @foobar.save_doc({})
 
-    class AddNameAndOccupation < Migration
+    class AddNameAndOccupation < Caster::Migration
       on_database 'foobar'
 
       up do
@@ -16,7 +16,7 @@ describe 'add field: ' do
         end
       end
     end
-    Migrator.run AddNameAndOccupation
+    Caster::Migrator.run AddNameAndOccupation
   end
 
   it "should add name and occupation fields to all created docs" do

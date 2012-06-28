@@ -5,7 +5,7 @@ describe 'delete doc: ' do
     @doc1 = @foobar.save_doc({ 'type' => 'foo', 'name' => 'attila' })
     @doc2 = @foobar.save_doc({ 'type' => 'foo', 'name' => 'genghis' })
 
-    class DeleteDoc < Migration
+    class DeleteDoc < Caster::Migration
       on_database 'foobar'
 
       up do
@@ -14,7 +14,7 @@ describe 'delete doc: ' do
         end
       end
     end
-    Migrator.run DeleteDoc
+    Caster::Migrator.run DeleteDoc
   end
 
   it "should create a fuu for each foo" do
