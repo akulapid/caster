@@ -14,9 +14,8 @@ module Caster
   # defines an execution scope which is a set of documents over which migration operations run
   class Execution
 
-    def initialize database_name, view, query, &block
-      @database_name = database_name
-      @db = CouchRest.database "http://127.0.0.1:5984/#{database_name}"
+    def initialize db_handle, view, query, &block
+      @db = db_handle
       @view = view
       @query = query
       @operations = []

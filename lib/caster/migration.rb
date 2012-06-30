@@ -5,7 +5,7 @@ module Caster
   class Migration
 
     def self.on_database name
-      @database_name = name
+      @db = CouchRest.database "http://#{Caster.config[:host]}:#{Caster.config[:port]}/#{name}"
     end
 
     def self.up
@@ -19,7 +19,7 @@ module Caster
     end
 
     def self.over_scope view, query = {}, &block
-      @current_executions << Execution.new(@database_name, view, query, &block)
+      @current_executions << Execution.new(@db, view, query, &block)
     end
   end
 end
