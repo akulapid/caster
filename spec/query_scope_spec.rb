@@ -6,15 +6,9 @@ describe 'query scope: ' do
     @foo_loc2 = @foobar.save_doc({ 'loc' => 'foo' })
     @fuu_loc = @foobar.save_doc({ 'loc' => 'fuu' })
 
-    class AddNameToFoo < Caster::Migration
-
-      up do
-        over_scope 'foobar/foobar/by_loc', { 'key' => 'foo' } do
-          add 'name', 'atilla'
-        end
-      end
+    over_scope 'foobar/foobar/by_loc', { 'key' => 'foo' } do
+      add 'name', 'atilla'
     end
-    Caster::Migrator.run AddNameToFoo
   end
 
   it "should add name field to all docs with loc = foo" do

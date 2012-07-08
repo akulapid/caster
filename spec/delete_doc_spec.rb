@@ -5,14 +5,9 @@ describe 'delete doc: ' do
     @doc1 = @foobar.save_doc({ 'type' => 'foo', 'name' => 'attila' })
     @doc2 = @foobar.save_doc({ 'type' => 'foo', 'name' => 'genghis' })
 
-    class DeleteDoc < Caster::Migration
-      up do
-        over_scope 'foobar/foobar/all_foo' do
-          delete
-        end
-      end
+    over_scope 'foobar/foobar/all_foo' do
+      delete
     end
-    Caster::Migrator.run DeleteDoc
   end
 
   it "should create a fuu for each foo" do

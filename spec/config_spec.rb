@@ -6,13 +6,7 @@ describe 'config: ' do
 
     CouchRest.should_receive('database').with('http://host:port/foobar')
 
-    class Migration < Caster::Migration
-
-      up do
-        over_scope 'foobar/foobar/all' do
-          add 'name', 'atilla'
-        end
-      end
+    Execution.new('foobar/foobar/all', nil) do
     end
   end
 end

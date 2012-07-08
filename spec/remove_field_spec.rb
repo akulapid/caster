@@ -6,15 +6,9 @@ describe 'remove field: ' do
     @doc2 = @foobar.save_doc({ "type" => "foo", "name" => "fifo" })
     @doc3 = @foobar.save_doc({ "type" => "foo" })
 
-    class RemoveName < Caster::Migration
-
-      up do
-        over_scope 'foobar/foobar/all_foo' do
-          remove 'name'
-        end
-      end
+    over_scope 'foobar/foobar/all_foo' do
+      remove 'name'
     end
-    Caster::Migrator.run RemoveName
   end
 
   it "should remove name field from all docs" do

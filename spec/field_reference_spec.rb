@@ -4,16 +4,10 @@ describe 'refer field within the same document: ' do
   before do
     @doc = @foobar.save_doc({ 'type' => 'foo', 'name' => 'attila', 'stats' => { 'score' => 5 }})
 
-    class UpdateName < Caster::Migration
-
-      up do
-        over_scope 'foobar/foobar/all_foo' do
-          add 'title', doc('name')
-          add 'victories', doc('stats.score')
-        end
-      end
+    over_scope 'foobar/foobar/all_foo' do
+      add 'title', doc('name')
+      add 'victories', doc('stats.score')
     end
-    Caster::Migrator.run UpdateName
   end
 
   it "should refer and add name" do
@@ -33,16 +27,10 @@ describe 'refer field from another doc type: ' do
     @fuu_doc1 = @foobar.save_doc({ 'type' => 'fuu', 'name' => 'attila', 'stats' => { 'score' => 5 }, 'foo_id' => @foo_doc1['id'] })
     @fuu_doc2 = @foobar.save_doc({ 'type' => 'fuu', 'name' => 'genghis', 'stats' => { 'score' => 8 }, 'foo_id' => @foo_doc2['id'] })
 
-    class CopyName < Caster::Migration
-
-      up do
-        over_scope 'foobar/foobar/all_foo' do
-          add 'name', query('foobar/all_fuu').linked_by('foo_id').field('name')
-          add 'victories', query('foobar/all_fuu').linked_by('foo_id').field('stats.score')
-        end
-      end
+    over_scope 'foobar/foobar/all_foo' do
+      add 'name', query('foobar/all_fuu').linked_by('foo_id').field('name')
+      add 'victories', query('foobar/all_fuu').linked_by('foo_id').field('stats.score')
     end
-    Caster::Migrator.run CopyName
   end
 
   it "should add name to all foos from their respective fuus" do
@@ -66,15 +54,9 @@ describe 'copy field where the target field is linked by a field nested deep ins
     @foo_doc = @foobar.save_doc({ 'type' => 'foo' })
     @fuu_doc = @foobar.save_doc({ 'type' => 'fuu', 'name' => 'attila', 'foo' => { 'id' => @foo_doc['id'] }})
 
-    class CopyName < Caster::Migration
-
-      up do
-        over_scope 'foobar/foobar/all_foo' do
-          add 'name', query('foobar/all_fuu').linked_by('foo.id').field('name')
-        end
-      end
+    over_scope 'foobar/foobar/all_foo' do
+      add 'name', query('foobar/all_fuu').linked_by('foo.id').field('name')
     end
-    Caster::Migrator.run CopyName
   end
 
   it "should retrieve and add name" do
@@ -87,15 +69,9 @@ describe 'copy entire document into a field: ' do
     @foo_doc = @foobar.save_doc({ 'type' => 'foo' })
     @fuu_doc = @foobar.save_doc({ 'type' => 'fuu', 'name' => 'attila', 'foo_id' => @foo_doc['id'] })
 
-    class CopyName < Caster::Migration
-
-      up do
-        over_scope 'foobar/foobar/all_foo' do
-          add 'fuu', query('foobar/all_fuu').linked_by('foo_id')
-        end
-      end
+    over_scope 'foobar/foobar/all_foo' do
+      add 'fuu', query('foobar/all_fuu').linked_by('foo_id')
     end
-    Caster::Migrator.run CopyName
   end
 
   it "should retrieve and add name" do
@@ -108,15 +84,9 @@ describe 'copy current document itself into a field (not real use case, keeping 
     @foo_doc = @foobar.save_doc({ 'type' => 'foo', 'name' => 'attila' })
     @expected_doc = @foobar.get(@foo_doc['id'])
 
-    class CopyName < Caster::Migration
-
-      up do
-        over_scope 'foobar/foobar/all_foo' do
-          add 'fuu', doc
-        end
-      end
+    over_scope 'foobar/foobar/all_foo' do
+      add 'fuu', doc
     end
-    Caster::Migrator.run CopyName
   end
 
   it "should retrieve and add name" do

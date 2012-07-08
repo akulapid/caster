@@ -6,19 +6,13 @@ describe 'view scope: ' do
     @fuu_type = @foobar.save_doc({ 'type' => 'fuu' })
     @fii_type = @foobar.save_doc({ 'type' => 'fii' })
 
-    class AddNameToFoo < Caster::Migration
-
-      up do
-        over_scope 'foobar/foobar/all_foo' do
-          add 'name', 'atilla'
-        end
-
-        over_scope 'foobar/foobar/all_fii' do
-          add 'name', 'genghis'
-        end
-      end
+    over_scope 'foobar/foobar/all_foo' do
+      add 'name', 'atilla'
     end
-    Caster::Migrator.run AddNameToFoo
+
+    over_scope 'foobar/foobar/all_fii' do
+      add 'name', 'genghis'
+    end
   end
 
   it "should add name field to view all_foo" do

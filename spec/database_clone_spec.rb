@@ -5,16 +5,11 @@ describe 'copy documents between databases: ' do
     @doc1 = @foobar.save_doc({ 'type' => 'foo' })
     @fuubar = CouchRest.database! 'http://127.0.0.1:5984/fuubar'
 
-    class CloneDatabase < Caster::Migration
-      fuubar = CouchRest.database! 'http://127.0.0.1:5984/fuubar'
+    fuubar = CouchRest.database! 'http://127.0.0.1:5984/fuubar'
 
-      up do
-        over_scope 'foobar/foobar/all_foo' do
-          create_on(fuubar, doc)
-        end
-      end
+    over_scope 'foobar/foobar/all_foo' do
+      create_on(fuubar, doc)
     end
-    Caster::Migrator.run CloneDatabase
   end
 
   it "should create @doc1 in fuubar" do
