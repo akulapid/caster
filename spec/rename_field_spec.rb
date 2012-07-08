@@ -4,7 +4,7 @@ describe 'rename field: ' do
   before do
     @doc = @foobar.save_doc({ "type" => "foo", "name" => "carman" })
 
-    over_scope 'foobar/foobar/all_foo' do
+    over 'foobar/foobar/all_foo' do
       rename 'name', 'title'
     end
   end

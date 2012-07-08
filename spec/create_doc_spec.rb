@@ -5,7 +5,7 @@ describe 'create doc: ' do
     @doc1 = @foobar.save_doc({ 'type' => 'foo', 'name' => 'attila' })
     @doc2 = @foobar.save_doc({ 'type' => 'foo', 'name' => 'genghis' })
 
-    over_scope 'foobar/foobar/all_foo' do
+    over 'foobar/foobar/all_foo' do
       create({ 'type' => 'fuu', 'title' => doc('name') })
     end
   end

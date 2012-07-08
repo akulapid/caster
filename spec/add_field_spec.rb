@@ -8,7 +8,7 @@ describe 'add field: ' do
   end
 
   it "should add name and occupation fields to all created docs" do
-    over_scope 'foobar/foobar/all' do
+    over 'foobar/foobar/all' do
       add 'name', 'atilla'
       add 'occupation', 'warrior'
     end

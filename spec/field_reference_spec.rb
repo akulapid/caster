@@ -4,7 +4,7 @@ describe 'refer field within the same document: ' do
   before do
     @doc = @foobar.save_doc({ 'type' => 'foo', 'name' => 'attila', 'stats' => { 'score' => 5 }})
 
-    over_scope 'foobar/foobar/all_foo' do
+    over 'foobar/foobar/all_foo' do
       add 'title', doc('name')
       add 'victories', doc('stats.score')
     end
@@ -27,9 +27,9 @@ describe 'refer field from another doc type: ' do
     @fuu_doc1 = @foobar.save_doc({ 'type' => 'fuu', 'name' => 'attila', 'stats' => { 'score' => 5 }, 'foo_id' => @foo_doc1['id'] })
     @fuu_doc2 = @foobar.save_doc({ 'type' => 'fuu', 'name' => 'genghis', 'stats' => { 'score' => 8 }, 'foo_id' => @foo_doc2['id'] })
 
-    over_scope 'foobar/foobar/all_foo' do
-      add 'name', from('foobar/all_fuu').linked_by('foo_id').field('name')
-      add 'victories', from('foobar/all_fuu').linked_by('foo_id').field('stats.score')
+    over 'foobar/foobar/all_foo' do
+      add 'name', from('foobar/all_fuu#name').linked_by('foo_id')
+      add 'victories', from('foobar/all_fuu#stats.score').linked_by('foo_id')
     end
   end
 
@@ -54,8 +54,8 @@ describe 'copy field where the target field is linked by a field nested deep ins
     @foo_doc = @foobar.save_doc({ 'type' => 'foo' })
     @fuu_doc = @foobar.save_doc({ 'type' => 'fuu', 'name' => 'attila', 'foo' => { 'id' => @foo_doc['id'] }})
 
-    over_scope 'foobar/foobar/all_foo' do
-      add 'name', from('foobar/all_fuu').linked_by('foo.id').field('name')
+    over 'foobar/foobar/all_foo' do
+      add 'name', from('foobar/all_fuu#name').linked_by('foo.id')
     end
   end
 
@@ -69,7 +69,7 @@ describe 'copy entire document into a field: ' do
     @foo_doc = @foobar.save_doc({ 'type' => 'foo' })
     @fuu_doc = @foobar.save_doc({ 'type' => 'fuu', 'name' => 'attila', 'foo_id' => @foo_doc['id'] })
 
-    over_scope 'foobar/foobar/all_foo' do
+    over 'foobar/foobar/all_foo' do
       add 'fuu', from('foobar/all_fuu').linked_by('foo_id')
     end
   end
@@ -84,7 +84,7 @@ describe 'copy current document itself into a field (not real use case, keeping 
     @foo_doc = @foobar.save_doc({ 'type' => 'foo', 'name' => 'attila' })
     @expected_doc = @foobar.get(@foo_doc['id'])
 
-    over_scope 'foobar/foobar/all_foo' do
+    over 'foobar/foobar/all_foo' do
       add 'fuu', doc
     end
   end

@@ -6,7 +6,7 @@ describe 'remove field: ' do
     @doc2 = @foobar.save_doc({ "type" => "foo", "name" => "fifo" })
     @doc3 = @foobar.save_doc({ "type" => "foo" })
 
-    over_scope 'foobar/foobar/all_foo' do
+    over 'foobar/foobar/all_foo' do
       remove 'name'
     end
   end

@@ -5,7 +5,8 @@ module Caster
 
   class CrossReference < Reference
 
-    def initialize db_handle, view, query
+    def initialize db_handle, scope, query
+      view, @value_field = scope.split('#', 2)
       rdocs = db_handle.view(view, query)['rows']
       @docs = rdocs.map { |rdoc| rdoc['value'] }
       self
@@ -13,11 +14,6 @@ module Caster
 
     def linked_by field
       @linked_field = field
-      self
-    end
-
-    def field field
-      @value_field = field
       self
     end
 

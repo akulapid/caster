@@ -6,7 +6,7 @@ describe 'query scope: ' do
     @foo_loc2 = @foobar.save_doc({ 'loc' => 'foo' })
     @fuu_loc = @foobar.save_doc({ 'loc' => 'fuu' })
 
-    over_scope 'foobar/foobar/by_loc', { 'key' => 'foo' } do
+    over 'foobar/foobar/by_loc', { 'key' => 'foo' } do
       add 'name', 'atilla'
     end
   end
