@@ -6,11 +6,10 @@ describe 'copy documents between databases: ' do
     @fuubar = CouchRest.database! 'http://127.0.0.1:5984/fuubar'
 
     class CloneDatabase < Caster::Migration
-      on_database 'foobar'
       fuubar = CouchRest.database! 'http://127.0.0.1:5984/fuubar'
 
       up do
-        over_scope 'foobar/all_foo' do
+        over_scope 'foobar/foobar/all_foo' do
           create_on(fuubar, doc)
         end
       end

@@ -7,10 +7,9 @@ describe 'query scope: ' do
     @fuu_loc = @foobar.save_doc({ 'loc' => 'fuu' })
 
     class AddNameToFoo < Caster::Migration
-      on_database 'foobar'
 
       up do
-        over_scope 'foobar/by_loc', { 'key' => 'foo' } do
+        over_scope 'foobar/foobar/by_loc', { 'key' => 'foo' } do
           add 'name', 'atilla'
         end
       end

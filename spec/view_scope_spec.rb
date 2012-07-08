@@ -7,14 +7,13 @@ describe 'view scope: ' do
     @fii_type = @foobar.save_doc({ 'type' => 'fii' })
 
     class AddNameToFoo < Caster::Migration
-      on_database 'foobar'
 
       up do
-        over_scope 'foobar/all_foo' do
+        over_scope 'foobar/foobar/all_foo' do
           add 'name', 'atilla'
         end
 
-        over_scope 'foobar/all_fii' do
+        over_scope 'foobar/foobar/all_fii' do
           add 'name', 'genghis'
         end
       end

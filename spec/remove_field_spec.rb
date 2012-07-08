@@ -7,10 +7,9 @@ describe 'remove field: ' do
     @doc3 = @foobar.save_doc({ "type" => "foo" })
 
     class RemoveName < Caster::Migration
-      on_database 'foobar'
 
       up do
-        over_scope 'foobar/all_foo' do
+        over_scope 'foobar/foobar/all_foo' do
           remove 'name'
         end
       end

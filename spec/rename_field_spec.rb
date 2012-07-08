@@ -5,10 +5,9 @@ describe 'rename field: ' do
     @doc = @foobar.save_doc({ "type" => "foo", "name" => "carman" })
 
     class RenameName < Caster::Migration
-      on_database 'foobar'
 
       up do
-        over_scope 'foobar/all_foo' do
+        over_scope 'foobar/foobar/all_foo' do
           rename 'name', 'title'
         end
       end

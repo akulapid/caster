@@ -7,10 +7,9 @@ describe 'add field: ' do
     @doc3 = @foobar.save_doc({})
 
     class AddNameAndOccupation < Caster::Migration
-      on_database 'foobar'
 
       up do
-        over_scope 'foobar/all' do
+        over_scope 'foobar/foobar/all' do
           add 'name', 'atilla'
           add 'occupation', 'warrior'
         end
