@@ -28,8 +28,8 @@ describe 'refer field from another doc type: ' do
     @fuu_doc2 = @foobar.save_doc({ 'type' => 'fuu', 'name' => 'genghis', 'stats' => { 'score' => 8 }, 'foo_id' => @foo_doc2['id'] })
 
     over_scope 'foobar/foobar/all_foo' do
-      add 'name', query('foobar/all_fuu').linked_by('foo_id').field('name')
-      add 'victories', query('foobar/all_fuu').linked_by('foo_id').field('stats.score')
+      add 'name', from('foobar/all_fuu').linked_by('foo_id').field('name')
+      add 'victories', from('foobar/all_fuu').linked_by('foo_id').field('stats.score')
     end
   end
 
@@ -55,7 +55,7 @@ describe 'copy field where the target field is linked by a field nested deep ins
     @fuu_doc = @foobar.save_doc({ 'type' => 'fuu', 'name' => 'attila', 'foo' => { 'id' => @foo_doc['id'] }})
 
     over_scope 'foobar/foobar/all_foo' do
-      add 'name', query('foobar/all_fuu').linked_by('foo.id').field('name')
+      add 'name', from('foobar/all_fuu').linked_by('foo.id').field('name')
     end
   end
 
@@ -70,7 +70,7 @@ describe 'copy entire document into a field: ' do
     @fuu_doc = @foobar.save_doc({ 'type' => 'fuu', 'name' => 'attila', 'foo_id' => @foo_doc['id'] })
 
     over_scope 'foobar/foobar/all_foo' do
-      add 'fuu', query('foobar/all_fuu').linked_by('foo_id')
+      add 'fuu', from('foobar/all_fuu').linked_by('foo_id')
     end
   end
 

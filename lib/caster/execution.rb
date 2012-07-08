@@ -47,7 +47,7 @@ module Caster
       @operations << Operation.new(db_handle, Clone.new(params))
     end
 
-    def query scope, query = {}
+    def from scope, query = {}
       CrossReference.new @db, scope, query
     end
 
