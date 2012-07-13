@@ -1,6 +1,11 @@
 module Caster
   class Reference
 
+    # to enable passing over method calls on the reference through method_missing
+    Object.instance_methods.each do |m|
+      undef_method m unless ['__send__', '__id__', 'object_id', 'is_a?'].include? m.to_s
+    end
+
     def initialize
       @post_eval_operation = []
     end
@@ -12,12 +17,16 @@ module Caster
 
     protected
     def access_field doc, accessor
-      value = eval('doc' << accessor.split('.').map { |field| "['#{field}']" }.join)
-      ret_value = (value.is_a? Fixnum)? value : value.clone
+      value = eval 'doc' << accessor.split('.').map { |field| "['#{field}']" }.join
+      (value.is_a? Fixnum)? value : value.clone
+    end
+
+    def access_field_with_tail doc, accessor
+      value = access_field doc, accessor
       (@post_eval_operation || []).each do |op|   # TODO: initialize post_eval_operation
-        ret_value = ret_value.send op[0], *op[1]
+        value = value.send op[0], *op[1]
       end
-      ret_value
+      value
     end
   end
 end

@@ -10,7 +10,7 @@ module Caster
     end
 
     def execute target_doc
-      (@accessor == nil)? target_doc.clone : access_field(target_doc, @accessor)
+      (@accessor == nil)? target_doc.clone : access_field_with_tail(target_doc, @accessor)
     end
   end
 end

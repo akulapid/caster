@@ -94,20 +94,37 @@ describe 'copy current document itself into a field (not real use case, keeping 
   end
 end
 
-describe 'perform operation over reference' do
+describe 'perform operation over self reference' do
   before do
     @doc = @foobar.save_doc({ 'type' => 'foo', 'name' => 'attila' })
 
     over 'foobar/foobar/all_foo' do
       add 'foo', doc('name').upcase!
-      add 'fuu', doc('name').upcase!.downcase!
+      add 'fuu', doc('name').upcase!.sub('ATTI', 'HO')
     end
   end
 
-  it "should retrieve and add name" do
-    db_doc = @foobar.get(@doc['id'])
-    db_doc['foo'].should == 'ATTILA'
-    db_doc['fuu'].should == 'attila'
+  it "should add uppercase name" do
+    @foobar.get(@doc['id'])['foo'].should == 'ATTILA'
+  end
+
+  it "should add transformed uppercase name" do
+    @foobar.get(@doc['id'])['fuu'].should == 'HOLA'
+  end
+end
+
+describe 'perform operation over cross reference: ' do
+  before do
+    @foo_doc = @foobar.save_doc({ 'type' => 'foo' })
+    @fuu_doc = @foobar.save_doc({ 'type' => 'fuu', 'name' => 'attila', 'foo_id' => @foo_doc['id'] })
+
+    over 'foobar/foobar/all_foo' do
+      add 'name', from('foobar/all_fuu#name').linked_by('foo_id').upcase!
+    end
+  end
+
+  it "should retrieve and add transformed  name" do
+    @foobar.get(@foo_doc['id'])['name'].should == 'ATTILA'
   end
 end
 
@@ -120,7 +137,21 @@ describe 'array operation over reference' do
     end
   end
 
-  it "should retrieve and add name" do
+  it "should retrieve and add last name" do
       @foobar.get(@doc['id'])['foo'].should == 'the_hun'
+  end
+end
+
+describe 'method call on reference' do
+  before do
+    @doc = @foobar.save_doc({ 'type' => 'foo', 'name' => 'attila' })
+
+    over 'foobar/foobar/all_foo' do
+      add 'foo', doc('name').class
+    end
+  end
+
+  it "should call method on target and not references" do
+      @foobar.get(@doc['id'])['foo'].should == 'String'
   end
 end
