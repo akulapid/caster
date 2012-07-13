@@ -5,6 +5,7 @@ module Caster
   class SelfReference < Reference
 
     def initialize accessor
+      super()
       @accessor = accessor
     end
 

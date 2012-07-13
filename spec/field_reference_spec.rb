@@ -93,3 +93,18 @@ describe 'copy current document itself into a field (not real use case, keeping 
     @foobar.get(@foo_doc['id'])['fuu'].should == @expected_doc
   end
 end
+
+describe 'perform operation over reference' do
+  before do
+    @doc = @foobar.save_doc({ 'type' => 'foo', 'name' => 'attila' })
+
+    over 'foobar/foobar/all_foo' do
+      add 'foo', doc('name').upcase!
+    end
+  end
+
+  it "should retrieve and add name" do
+    db_doc = @foobar.get(@doc['id'])
+    db_doc['foo'].should == 'ATTILA'
+  end
+end
