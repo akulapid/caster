@@ -27,3 +27,19 @@ describe 'view scope: ' do
     @foobar.get(@fii_type['id'])['name'].should == 'genghis'
   end
 end
+
+describe 'view with include docs' do
+  before do
+    @doc1 = @foobar.save_doc({ 'type' => 'foo' })
+    @doc2 = @foobar.save_doc({ 'type' => 'foo' })
+
+    over 'foobar/foobar/all_foo_ids', 'include_docs' => 'true' do
+      add 'name', 'atilla'
+    end
+  end
+
+  it "should add name field to view that emits doc ids" do
+    @foobar.get(@doc1['id'])['name'].should == 'atilla'
+    @foobar.get(@doc2['id'])['name'].should == 'atilla'
+  end
+end

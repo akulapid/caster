@@ -32,8 +32,11 @@ RSpec.configure do |config|
            },
            :by_loc => {
                :map => "function(doc) { emit(doc.loc, doc); }"
-           }
-       }
+           },
+          :all_foo_ids => {
+              :map => "function(doc) { if (doc.type == 'foo') emit (doc._id, doc._id); }"
+          }
+    }
     })
   end
 

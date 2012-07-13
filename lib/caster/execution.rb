@@ -59,7 +59,7 @@ module Caster
       rdocs = @db.view(@view, @query)['rows']
       db_docs_map = Hash.new { |k, v| k[v] = [] }
       rdocs.each do |rdoc|
-        doc = rdoc['value']
+        doc = rdoc.has_key?('doc')? rdoc['doc'] : rdoc['value']
         @operations.each do |op|
           db_docs_map[op.db_handle] << op.transformation.execute(doc)
         end
