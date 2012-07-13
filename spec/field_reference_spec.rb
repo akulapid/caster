@@ -110,3 +110,17 @@ describe 'perform operation over reference' do
     db_doc['fuu'].should == 'attila'
   end
 end
+
+describe 'array operation over reference' do
+  before do
+    @doc = @foobar.save_doc({ 'type' => 'foo', 'names' => ['attila', 'the_hun'] })
+
+    over 'foobar/foobar/all_foo' do
+      add 'foo', doc('names')[1]
+    end
+  end
+
+  it "should retrieve and add name" do
+      @foobar.get(@doc['id'])['foo'].should == 'the_hun'
+  end
+end
