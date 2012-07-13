@@ -61,7 +61,8 @@ module Caster
       rdocs.each do |rdoc|
         doc = rdoc.has_key?('doc')? rdoc['doc'] : rdoc['value']
         @operations.each do |op|
-          db_docs_map[op.db_handle] << op.transformation.execute(doc)
+          foo = op.transformation.execute(doc)
+          db_docs_map[op.db_handle] << foo
         end
       end
       db_docs_map.each do |db, docs|

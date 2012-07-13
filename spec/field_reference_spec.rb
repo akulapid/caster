@@ -100,11 +100,13 @@ describe 'perform operation over reference' do
 
     over 'foobar/foobar/all_foo' do
       add 'foo', doc('name').upcase!
+      add 'fuu', doc('name').upcase!.downcase!
     end
   end
 
   it "should retrieve and add name" do
     db_doc = @foobar.get(@doc['id'])
     db_doc['foo'].should == 'ATTILA'
+    db_doc['fuu'].should == 'attila'
   end
 end
