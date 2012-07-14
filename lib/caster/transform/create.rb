@@ -9,7 +9,7 @@ module Caster
       params = @params_template.clone
       params.each do |field, value|
         if value.is_a? Reference
-          params[field] = value.execute doc
+          params[field] = value.evaluate doc
         end
       end
       params

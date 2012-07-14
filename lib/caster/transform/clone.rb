@@ -1,13 +1,13 @@
 module Caster
   class Clone
 
-    def initialize ref
-      @ref = ref
+    def initialize source
+      @source = source
     end
 
     def execute doc
-      doc.delete '_rev'
-      @ref.execute doc
+      @source.delete '_rev'
+      @source
     end
   end
 end

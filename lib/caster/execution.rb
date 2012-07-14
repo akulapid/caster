@@ -6,8 +6,7 @@ require 'caster/transform/rename'
 require 'caster/transform/create'
 require 'caster/transform/delete'
 require 'caster/transform/clone'
-require 'caster/ref/cross_reference'
-require 'caster/ref/self_reference'
+require 'caster/ref/reference'
 
 module Caster
 
@@ -18,8 +17,7 @@ module Caster
       database_name, @view = scope.split('/', 2)
       @db = CouchRest.database "http://#{Caster.config[:host]}:#{Caster.config[:port]}/#{database_name}"
       @query = query
-      @operations = []
-      instance_eval &block
+      @block = block
     end
 
     def add field, value
@@ -48,11 +46,7 @@ module Caster
     end
 
     def from scope, query = {}
-      CrossReference.new @db, scope, query
-    end
-
-    def doc accessor = nil
-      SelfReference.new accessor
+      Reference.new @db, scope, query
     end
 
     def execute
@@ -60,9 +54,11 @@ module Caster
       db_docs_map = Hash.new { |k, v| k[v] = [] }
       rdocs.each do |rdoc|
         doc = rdoc.has_key?('doc')? rdoc['doc'] : rdoc['value']
+
+        @operations = []
+        instance_exec doc.clone, &@block
         @operations.each do |op|
-          foo = op.transformation.execute(doc)
-          db_docs_map[op.db_handle] << foo
+          db_docs_map[op.db_handle] << op.transformation.execute(doc)
         end
       end
       db_docs_map.each do |db, docs|

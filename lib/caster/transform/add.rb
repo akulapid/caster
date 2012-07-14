@@ -14,7 +14,7 @@ module Caster
     end
 
     def evaluate obj, target_doc
-      (obj.is_a? Reference)? obj.execute(target_doc) : obj
+      (obj.is_a? Reference)? obj.evaluate(target_doc) : obj
     end
   end
 end

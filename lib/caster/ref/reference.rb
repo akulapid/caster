@@ -6,8 +6,16 @@ module Caster
       undef_method m unless ['__send__', '__id__', 'object_id', 'is_a?'].include? m.to_s
     end
 
-    def initialize
+    def initialize db_handle, scope, query
+      view, @value_field = scope.split('#', 2)
+      rdocs = db_handle.view(view, query)['rows']
+      @docs = rdocs.map { |rdoc| rdoc['value'] }
       @post_eval_operation = []
+    end
+
+    def linked_by field
+      @linked_field = field
+      self
     end
 
     def method_missing method_name, *args
@@ -15,18 +23,27 @@ module Caster
       self
     end
 
-    protected
-    def access_field doc, accessor
-      value = eval 'doc' << accessor.split('.').map { |field| "['#{field}']" }.join
-      (value.is_a? Fixnum)? value : value.clone
+    def evaluate target_doc
+      @docs.each do |doc|
+        if deref(doc, @linked_field) == target_doc['_id']
+          if @value_field == nil
+            return doc
+          else
+            value = deref doc, @value_field
+            @post_eval_operation.each do |op|
+              value = value.send op[0], *op[1]
+            end
+            return value
+          end
+        end
+      end
+      nil
     end
 
-    def access_field_with_tail doc, accessor
-      value = access_field doc, accessor
-      (@post_eval_operation || []).each do |op|   # TODO: initialize post_eval_operation
-        value = value.send op[0], *op[1]
-      end
-      value
+    private
+    def deref doc, accessor
+      value = eval 'doc' << accessor.split('.').map { |field| "['#{field}']" }.join
+      (value.is_a? Fixnum)? value : value.clone
     end
   end
 end

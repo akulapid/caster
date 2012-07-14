@@ -4,9 +4,9 @@ describe 'refer field within the same document: ' do
   before do
     @doc = @foobar.save_doc({ 'type' => 'foo', 'name' => 'attila', 'stats' => { 'score' => 5 }})
 
-    over 'foobar/foobar/all_foo' do
-      add 'title', doc('name')
-      add 'victories', doc('stats.score')
+    over 'foobar/foobar/all_foo' do |doc|
+      add 'title', doc['name']
+      add 'victories', doc['stats']['score']
     end
   end
 
@@ -84,7 +84,7 @@ describe 'copy current document itself into a field (not real use case, keeping 
     @foo_doc = @foobar.save_doc({ 'type' => 'foo', 'name' => 'attila' })
     @expected_doc = @foobar.get(@foo_doc['id'])
 
-    over 'foobar/foobar/all_foo' do
+    over 'foobar/foobar/all_foo' do |doc|
       add 'fuu', doc
     end
   end
@@ -94,13 +94,13 @@ describe 'copy current document itself into a field (not real use case, keeping 
   end
 end
 
-describe 'perform operation over self reference' do
+describe 'operations over self reference' do
   before do
     @doc = @foobar.save_doc({ 'type' => 'foo', 'name' => 'attila' })
 
-    over 'foobar/foobar/all_foo' do
-      add 'foo', doc('name').upcase!
-      add 'fuu', doc('name').upcase!.sub('ATTI', 'HO')
+    over 'foobar/foobar/all_foo' do |doc|
+      add 'foo', doc['name'].upcase
+      add 'fuu', doc['name'].upcase.sub('ATTI', 'HO')
     end
   end
 
@@ -113,7 +113,7 @@ describe 'perform operation over self reference' do
   end
 end
 
-describe 'perform operation over cross reference: ' do
+describe 'method call over reference: ' do
   before do
     @foo_doc = @foobar.save_doc({ 'type' => 'foo' })
     @fuu_doc = @foobar.save_doc({ 'type' => 'fuu', 'name' => 'attila', 'foo_id' => @foo_doc['id'] })
@@ -123,35 +123,37 @@ describe 'perform operation over cross reference: ' do
     end
   end
 
-  it "should retrieve and add transformed  name" do
+  it "should retrieve and add upper case name" do
     @foobar.get(@foo_doc['id'])['name'].should == 'ATTILA'
   end
 end
 
 describe 'array operation over reference' do
   before do
-    @doc = @foobar.save_doc({ 'type' => 'foo', 'names' => ['attila', 'the_hun'] })
+    @foo_doc = @foobar.save_doc({ 'type' => 'foo' })
+    @fuu_doc = @foobar.save_doc({ 'type' => 'fuu', 'names' => ['attila', 'the hun'], 'foo_id' => @foo_doc['id'] })
 
     over 'foobar/foobar/all_foo' do
-      add 'foo', doc('names')[1]
+      add 'name', from('foobar/all_fuu#names').linked_by('foo_id')[1]
     end
   end
 
   it "should retrieve and add last name" do
-      @foobar.get(@doc['id'])['foo'].should == 'the_hun'
+    @foobar.get(@foo_doc['id'])['name'].should == 'the hun'
   end
 end
 
-describe 'method call on reference' do
+describe 'object instance method calls on reference' do
   before do
-    @doc = @foobar.save_doc({ 'type' => 'foo', 'name' => 'attila' })
+    @foo_doc = @foobar.save_doc({ 'type' => 'foo', 'name' => 'attila' })
+    @fuu_doc = @foobar.save_doc({ 'type' => 'fuu', 'name' => 'attila', 'foo_id' => @foo_doc['id'] })
 
     over 'foobar/foobar/all_foo' do
-      add 'foo', doc('name').class
+      add 'class', from('foobar/all_fuu#name').linked_by('foo_id').class
     end
   end
 
   it "should call method on target and not references" do
-      @foobar.get(@doc['id'])['foo'].should == 'String'
+      @foobar.get(@foo_doc['id'])['class'].should == 'String'
   end
 end
