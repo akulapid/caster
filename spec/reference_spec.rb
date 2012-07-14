@@ -123,3 +123,32 @@ describe 'object instance method calls on reference' do
       @foobar.get(@foo_doc['id'])['class'].should == 'String'
   end
 end
+
+describe 'refer documents from another database' do
+  before do
+    @fuubar = CouchRest.database! 'http://127.0.0.1:5984/fuubar'
+    @fuubar.save_doc({
+      '_id' => '_design/fuubar',
+      :views => {
+         :all_fuu => {
+             :map => "function(doc) { if (doc.type == 'fuu') emit (doc._id, doc); }"
+         }
+      }
+    })
+
+    @foo_doc = @foobar.save_doc({ 'type' => 'foo', 'name' => 'attila'})
+    @fuu_doc = @fuubar.save_doc({ 'type' => 'fuu', 'foo_id' => @foo_doc['id'] })
+
+    over 'foobar/foobar/all_foo' do |doc|
+      add 'title', from('fuubar/fuubar/all_fuu').where{ |src| src['foo_id'] == doc['_id'] }
+    end
+  end
+
+  it "should refer and add name" do
+    @foobar.get(@foo_doc['id'])['name'].should == 'attila'
+  end
+
+  after do
+    @fuubar.delete!
+  end
+end

@@ -46,7 +46,13 @@ module Caster
     end
 
     def from scope, query = {}
-      Reference.new @db, scope, query
+      if scope.scan('/').length == 1
+        return Reference.new @db, scope, query
+      else
+        database_name, view = scope.split('/', 2)
+        db = CouchRest.database "http://#{Caster.config[:host]}:#{Caster.config[:port]}/#{database_name}"
+        return Reference.new db, view, query
+      end
     end
 
     def execute
