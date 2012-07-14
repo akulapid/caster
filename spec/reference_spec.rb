@@ -1,24 +1,5 @@
 require 'spec_helper'
 
-describe 'refer field within the same document: ' do
-  before do
-    @doc = @foobar.save_doc({ 'type' => 'foo', 'name' => 'attila', 'stats' => { 'score' => 5 }})
-
-    over 'foobar/foobar/all_foo' do |doc|
-      add 'title', doc['name']
-      add 'victories', doc['stats']['score']
-    end
-  end
-
-  it "should refer and add name" do
-    @foobar.get(@doc['id'])['name'].should == 'attila'
-  end
-
-  it "should refer and add nested field score" do
-    @foobar.get(@doc['id'])['victories'].should == 5
-  end
-end
-
 describe 'refer field from another doc type: ' do
   before do
     @foo_doc1 = @foobar.save_doc({ 'type' => 'foo' })
@@ -27,9 +8,9 @@ describe 'refer field from another doc type: ' do
     @fuu_doc1 = @foobar.save_doc({ 'type' => 'fuu', 'name' => 'attila', 'stats' => { 'score' => 5 }, 'foo_id' => @foo_doc1['id'] })
     @fuu_doc2 = @foobar.save_doc({ 'type' => 'fuu', 'name' => 'genghis', 'stats' => { 'score' => 8 }, 'foo_id' => @foo_doc2['id'] })
 
-    over 'foobar/foobar/all_foo' do
-      add 'name', from('foobar/all_fuu#name').linked_by('foo_id')
-      add 'victories', from('foobar/all_fuu#stats.score').linked_by('foo_id')
+    over 'foobar/foobar/all_foo' do |doc|
+      add 'name', from('foobar/all_fuu').where{ |src| src['foo_id'] == doc['_id'] }['name']
+      add 'victories', from('foobar/all_fuu').where{ |src| src['foo_id'] == doc['_id'] }['stats']['score']
     end
   end
 
@@ -54,8 +35,8 @@ describe 'copy field where the target field is linked by a field nested deep ins
     @foo_doc = @foobar.save_doc({ 'type' => 'foo' })
     @fuu_doc = @foobar.save_doc({ 'type' => 'fuu', 'name' => 'attila', 'foo' => { 'id' => @foo_doc['id'] }})
 
-    over 'foobar/foobar/all_foo' do
-      add 'name', from('foobar/all_fuu#name').linked_by('foo.id')
+    over 'foobar/foobar/all_foo' do |doc|
+      add 'name', from('foobar/all_fuu').where{ |src| src['foo']['id'] == doc['_id'] }['name']
     end
   end
 
@@ -69,28 +50,13 @@ describe 'copy entire document into a field: ' do
     @foo_doc = @foobar.save_doc({ 'type' => 'foo' })
     @fuu_doc = @foobar.save_doc({ 'type' => 'fuu', 'name' => 'attila', 'foo_id' => @foo_doc['id'] })
 
-    over 'foobar/foobar/all_foo' do
-      add 'fuu', from('foobar/all_fuu').linked_by('foo_id')
+    over 'foobar/foobar/all_foo' do |doc|
+      add 'fuu', from('foobar/all_fuu').where{ |src| src['foo_id'] == doc['_id'] }
     end
   end
 
   it "should retrieve and add name" do
     @foobar.get(@foo_doc['id'])['fuu'].should == @foobar.get(@fuu_doc['id'])
-  end
-end
-
-describe 'copy current document itself into a field (not real use case, keeping for syntax purposes): ' do
-  before do
-    @foo_doc = @foobar.save_doc({ 'type' => 'foo', 'name' => 'attila' })
-    @expected_doc = @foobar.get(@foo_doc['id'])
-
-    over 'foobar/foobar/all_foo' do |doc|
-      add 'fuu', doc
-    end
-  end
-
-  it "should retrieve and add name" do
-    @foobar.get(@foo_doc['id'])['fuu'].should == @expected_doc
   end
 end
 
@@ -118,8 +84,8 @@ describe 'method call over reference: ' do
     @foo_doc = @foobar.save_doc({ 'type' => 'foo' })
     @fuu_doc = @foobar.save_doc({ 'type' => 'fuu', 'name' => 'attila', 'foo_id' => @foo_doc['id'] })
 
-    over 'foobar/foobar/all_foo' do
-      add 'name', from('foobar/all_fuu#name').linked_by('foo_id').upcase!
+    over 'foobar/foobar/all_foo' do |doc|
+      add 'name', from('foobar/all_fuu').where{ |src| src['foo_id'] == doc['_id'] }['name'].upcase!
     end
   end
 
@@ -133,8 +99,8 @@ describe 'array operation over reference' do
     @foo_doc = @foobar.save_doc({ 'type' => 'foo' })
     @fuu_doc = @foobar.save_doc({ 'type' => 'fuu', 'names' => ['attila', 'the hun'], 'foo_id' => @foo_doc['id'] })
 
-    over 'foobar/foobar/all_foo' do
-      add 'name', from('foobar/all_fuu#names').linked_by('foo_id')[1]
+    over 'foobar/foobar/all_foo' do |doc|
+      add 'name', from('foobar/all_fuu').where{ |src| src['foo_id'] == doc['_id'] }['names'][1]
     end
   end
 
@@ -148,8 +114,8 @@ describe 'object instance method calls on reference' do
     @foo_doc = @foobar.save_doc({ 'type' => 'foo', 'name' => 'attila' })
     @fuu_doc = @foobar.save_doc({ 'type' => 'fuu', 'name' => 'attila', 'foo_id' => @foo_doc['id'] })
 
-    over 'foobar/foobar/all_foo' do
-      add 'class', from('foobar/all_fuu#name').linked_by('foo_id').class
+    over 'foobar/foobar/all_foo' do |doc|
+      add 'class', from('foobar/all_fuu').where{ |src| src['foo_id'] == doc['_id'] }['name'].class
     end
   end
 

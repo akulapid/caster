@@ -43,3 +43,23 @@ describe 'view with include docs' do
     @foobar.get(@doc2['id'])['name'].should == 'atilla'
   end
 end
+
+describe 'refer scoped documents' do
+  before do
+    @doc = @foobar.save_doc({ 'type' => 'foo', 'name' => 'attila', 'stats' => { 'score' => 5 }})
+
+    over 'foobar/foobar/all_foo' do |doc|
+      add 'title', doc['name']
+      add 'victories', doc['stats']['score']
+    end
+  end
+
+  it "should refer and add name" do
+    @foobar.get(@doc['id'])['name'].should == 'attila'
+  end
+
+  it "should refer and add nested field score" do
+    @foobar.get(@doc['id'])['victories'].should == 5
+  end
+end
+
