@@ -1,6 +1,5 @@
 require 'yaml'
 require 'caster/migration'
-require 'caster/migrator'
 
 include Caster
 
