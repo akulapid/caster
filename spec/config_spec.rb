@@ -6,7 +6,7 @@ describe 'config: ' do
 
     CouchRest.should_receive('database').with('http://host:port/foobar')
 
-    Execution.new('foobar/foobar/all', nil) do
+    Execution.new('foobar', 'foobar/all', nil) do
     end
   end
 end
