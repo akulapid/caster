@@ -8,4 +8,5 @@ Gem::Specification.new do |s|
   s.email       = 'manohar.akula@gmail.com'
   s.homepage    = 'http://github.com/akula1001/caster'
   s.files       = `git ls-files lib`.split("\n")
+  s.executables << 'cast'
 end

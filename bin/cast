@@ -1,0 +1,30 @@
+#!/usr/bin/env ruby
+
+require 'caster'
+require 'caster/migrator'
+require 'thor'
+require 'couchrest'
+
+class Cast < Thor
+
+  desc 'version', 'prints the current version of your database'
+  method_option :db, :aliases => '-d', :required => true
+  def version
+    db = CouchRest.database! "http://#{Caster.config[:host]}:#{Caster.config[:port]}/#{options[:db]}"
+    begin
+      puts db.get("#{Caster.config[:metadoc_id_prefix]}_#{database}")['version']
+    rescue
+      puts "No version information available."
+    end
+  end
+
+  desc 'up', 'executes migrations defined in cast files in the current directory'
+  method_option :db, :aliases => '-d', :required => true
+  method_option :version, :aliases => '-v'
+  def up path = '.'
+    Migrator.new.migrate_dir options[:db], path, options[:version]
+    puts 'Done.'
+  end
+end
+
+Cast.start
