@@ -3,7 +3,7 @@ require 'caster/migrator'
 
 describe 'migrate caster script in file: ' do
   before do
-    @res = "#{File.dirname(__FILE__)}/res/000.foobar.add_name_to_foo.cast"
+    @res = "#{File.dirname(__FILE__)}/res/single_migration/000.foobar.add_name_to_foo.cast"
     @doc = @foobar.save_doc({ 'type' => 'foo' })
   end
 

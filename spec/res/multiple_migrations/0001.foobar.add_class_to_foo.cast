@@ -1,0 +1,4 @@
+
+over 'foobar/all_foo' do
+  add 'class', 'hun'
+end
