@@ -7,7 +7,9 @@ module Caster
 
   @config = {
     :host => '127.0.0.1',
-    :port => '5984'
+    :port => '5984',
+    :metadoc_type => 'caster_metadoc',
+    :metadoc_id_prefix => 'caster'
   }
 
   @valid_config_keys = @config.keys
