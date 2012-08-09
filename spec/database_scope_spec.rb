@@ -5,7 +5,7 @@ describe 'using a database scope: ' do
     @doc = @foobar.save_doc({})
   end
 
-  it "should add name and title to all docs in foo bar" do
+  it "should add name and title to all docs in foobar" do
     migrate 'foobar' do
       over 'foobar/all' do
         add 'name', 'atilla'
