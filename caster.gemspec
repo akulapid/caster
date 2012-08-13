@@ -9,4 +9,6 @@ Gem::Specification.new do |s|
   s.homepage    = 'http://github.com/akula1001/caster'
   s.files       = `git ls-files lib`.split("\n")
   s.executables << 'cast'
+  s.add_runtime_dependency 'couchrest'
+  s.add_runtime_dependency 'thor'
 end
