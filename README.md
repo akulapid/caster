@@ -27,7 +27,7 @@ over 'foobar/by_id' do
 end
 ```
 
-A query can be passes to restrict the scope of the operation.
+A query can be passed to restrict the scope of the operation.
 
 ```ruby
 over 'foobar/by_score', { 'key' => '0' } do
@@ -35,7 +35,7 @@ over 'foobar/by_score', { 'key' => '0' } do
 end
 ```
 
-You can refer other fields in the document using the parameter implicitly passed to the block. You can freely use ruby code anywhere, so you can call other functions to perform transformations that you want.
+You can refer other fields in the document using the implicit parameter passed to the block. You can freely use ruby code anywhere, so you can call other functions to perform transformations that you want.
 
 ```ruby
 over 'foobar/by_id' do |doc|
