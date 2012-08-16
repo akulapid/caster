@@ -24,14 +24,16 @@ module Caster
     begin
       config = YAML.load_file path_to_yaml_file
     rescue Errno::ENOENT
-      log :warning, "YAML configuration file couldn't be found.. using defaults."
+      puts "YAML configuration file couldn't be found.. using defaults."
       return
     rescue Psych::SyntaxError
-      log :warning, "YAML configuration file contains invalid syntax.. using defaults."
+      puts "YAML configuration file contains invalid syntax.. using defaults."
       return
     end
     configure(config)
   end
+
+  self.configure_with 'caster.yml'
 
   def self.config
     @config
