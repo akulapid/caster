@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'caster'
-  s.version     = '0.9.1'
+  s.version     = '0.9.2'
   s.platform    = Gem::Platform::RUBY
   s.summary     = "Casters for your couch database"
   s.description = "A migration framework for couchdb databases"
