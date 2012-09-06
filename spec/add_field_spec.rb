@@ -19,3 +19,17 @@ describe 'add field: ' do
     end
   end
 end
+
+describe 'add nested field: ' do
+  before do
+    @doc = @foobar.save_doc({})
+  end
+
+  it 'should add name as doc["account"]["profile"]["name"]' do
+    over 'foobar/foobar/all' do
+      add 'profile.name', 'atilla'
+    end
+
+    @foobar.get(@doc['id'])['profile']['name'].should == 'atilla'
+  end
+end

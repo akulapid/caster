@@ -1,4 +1,5 @@
 require 'couchrest'
+require 'caster/accessor'
 
 module Caster
   class Add
@@ -6,10 +7,11 @@ module Caster
     def initialize field, value
       @field = field
       @value = value
+      @accessor = Accessor.new
     end
 
     def execute doc
-      doc[@field] = evaluate(@value, doc)
+      @accessor.set doc, @field, evaluate(@value, doc)
       doc
     end
 

@@ -1,3 +1,5 @@
+require 'caster/accessor'
+
 module Caster
   class Reference
 
@@ -10,6 +12,7 @@ module Caster
       rdocs = db_handle.view(view, query)['rows']
       @docs = rdocs.map { |rdoc| rdoc['doc'] or rdoc['value'] }
       @post_eval_calls = []
+      @accessor = Accessor.new
     end
 
     def where &predicate
@@ -25,7 +28,7 @@ module Caster
     def evaluate target_doc
       @docs.each do |doc|
         if @predicate.call doc
-          value = deref(doc, @value_field)
+          value = @accessor.get doc, @value_field
           @post_eval_calls.each do |args|
             value = value.send args[0], *args[1]
           end
@@ -33,13 +36,6 @@ module Caster
         end
       end
       nil
-    end
-
-    private
-    def deref doc, accessor
-      return doc if accessor == nil
-      value = eval 'doc' << accessor.split('.').map { |field| "['#{field}']" }.join
-      (value.is_a? Fixnum)? value : value.clone
     end
   end
 end

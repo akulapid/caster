@@ -6,7 +6,7 @@ require 'caster/transform/rename'
 require 'caster/transform/create'
 require 'caster/transform/delete'
 require 'caster/transform/clone'
-require 'caster/ref/reference'
+require 'caster/reference'
 
 module Caster
 
