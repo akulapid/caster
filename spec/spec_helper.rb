@@ -35,6 +35,9 @@ RSpec.configure do |config|
            },
           :all_foo_ids => {
               :map => "function(doc) { if (doc.type == 'foo') emit (doc._id, doc._id); }"
+          },
+          :null_emitting_all_fuu => {
+              :map => "function(doc) { if (doc.type == 'fuu') emit (null, doc._id); }"
           }
     }
     })

@@ -8,7 +8,7 @@ module Caster
 
     def initialize db_handle, view, query
       rdocs = db_handle.view(view, query)['rows']
-      @docs = rdocs.map { |rdoc| rdoc['value'] }
+      @docs = rdocs.map { |rdoc| rdoc['doc'] or rdoc['value'] }
       @post_eval_calls = []
     end
 

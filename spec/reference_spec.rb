@@ -152,3 +152,18 @@ describe 'refer documents from another database' do
     @fuubar.delete!
   end
 end
+
+describe 'field reference over view that emits null' do
+  before do
+    @foo_doc = @foobar.save_doc({ 'type' => 'foo' })
+    @fuu_doc = @foobar.save_doc({ 'type' => 'fuu', 'name' => 'attila', 'foo_id' => @foo_doc['id'] })
+
+    over 'foobar/foobar/all_foo' do |foo|
+      add 'name', from('foobar/null_emitting_all_fuu', 'include_docs' => 'true').where{ |fuu| fuu['foo_id'] == foo['_id'] }['name']
+    end
+  end
+
+  it 'should add name to all foos from their respective fuus' do
+    @foobar.get(@foo_doc['id'])['name'].should == 'attila'
+  end
+end
