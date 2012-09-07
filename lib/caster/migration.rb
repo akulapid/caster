@@ -15,12 +15,12 @@ module Caster
   end
 
   def over scope, query = {}, &block
-    database_name, view = split(scope)
+    database_name, view = split_view_accessor(scope)
     db = CouchRest.database "http://#{Caster.config[:host]}:#{Caster.config[:port]}/#{database_name}" if @db == nil
     Execution.new(db || @db, view, query, &block).execute
   end
 
-  def split scope
+  def split_view_accessor scope
     if scope.count('/') == 1
       return nil, scope
     elsif scope.count('/') == 2
