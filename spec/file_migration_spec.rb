@@ -5,10 +5,11 @@ describe 'migrate caster script in file: ' do
   before do
     @res = "#{File.dirname(__FILE__)}/res/single_migration/000.foobar.add_name_to_foo.cast"
     @doc = @foobar.save_doc({ 'type' => 'foo' })
+    @migrator = Migrator.new MetadataDocument.new
   end
 
   it "should add metadoc with version" do
-    Migrator.new.migrate_file @res
+    @migrator.migrate_file @res
 
     @foobar.get('caster_foobar')['version'].should == '000'
   end
@@ -20,7 +21,7 @@ describe 'migrate caster script in file: ' do
       'version' => '001'
     })
 
-    lambda { Migrator.new.migrate_file @res }.should raise_exception
+    lambda { @migrator.migrate_file @res }.should raise_exception
   end
 
   it "should update version" do
@@ -30,13 +31,13 @@ describe 'migrate caster script in file: ' do
         'version' => '0'
     })
 
-    Migrator.new.migrate_file @res
+    @migrator.migrate_file @res
 
     @foobar.get('caster_foobar')['version'].should == '000'
   end
 
   it "should add name all docs in foobar" do
-    Migrator.new.migrate_file @res
+    @migrator.migrate_file @res
 
     @foobar.get(@doc['id'])['name'].should == 'atilla'
   end

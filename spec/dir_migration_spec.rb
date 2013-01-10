@@ -6,10 +6,11 @@ describe 'migrate specific database inside a directory of assorted cast files: '
   before do
     @doc = @foobar.save_doc({ 'type' => 'foo' })
     @res = "#{File.dirname(__FILE__)}/res/multiple_migrations"
+    @migrator = Migrator.new MetadataDocument.new
   end
 
   it "should run migrations 000, 0001, 001 for foobar" do
-    Migrator.new.migrate_in_dir @res, 'foobar'
+    @migrator.migrate_in_dir @res, 'foobar'
 
     @foobar.get(@doc['id'])['name'].should == 'atilla'
     @foobar.get(@doc['id'])['class'].should == 'hun'
@@ -17,7 +18,7 @@ describe 'migrate specific database inside a directory of assorted cast files: '
   end
 
   it "should update revision" do
-    Migrator.new.migrate_in_dir @res, 'foobar'
+    @migrator.migrate_in_dir @res, 'foobar'
 
     @foobar.get('caster_foobar')['version'].should == '001'
   end
@@ -29,7 +30,7 @@ describe 'migrate specific database inside a directory of assorted cast files: '
          'version' => '000'
     })
 
-    Migrator.new.migrate_in_dir @res, 'foobar'
+    @migrator.migrate_in_dir @res, 'foobar'
 
     @foobar.get(@doc['id'])['name'].should == nil
     @foobar.get(@doc['id'])['class'].should == 'hun'
@@ -37,7 +38,7 @@ describe 'migrate specific database inside a directory of assorted cast files: '
   end
 
   it "should run migrations for foobar upto 0001 only" do
-    Migrator.new.migrate_in_dir @res, 'foobar', '0001'
+    @migrator.migrate_in_dir @res, 'foobar', '0001'
 
     @foobar.get(@doc['id'])['name'].should == 'atilla'
     @foobar.get(@doc['id'])['class'].should == 'hun'
@@ -45,7 +46,7 @@ describe 'migrate specific database inside a directory of assorted cast files: '
   end
 
   it "should not run fuubar migrations" do
-    Migrator.new.migrate_in_dir @res, 'foobar'
+    @migrator.migrate_in_dir @res, 'foobar'
 
     @foobar.get(@doc['id'])['oops'].should == nil
   end
@@ -68,10 +69,12 @@ describe 'migrate all cast scripts inside a directory to the latest version: ' d
     @fuu_doc = @fuubar.save_doc({ 'type' => 'fuu' })
 
     @res = "#{File.dirname(__FILE__)}/res/multiple_migrations"
+
+    @migrator = Migrator.new MetadataDocument.new
   end
 
   it "should run all migrations 000, 0001, 001 for foobar and 000 for fuubar" do
-    Migrator.new.migrate_in_dir @res
+    @migrator.migrate_in_dir @res
 
     @foobar.get(@foo_doc['id'])['name'].should == 'atilla'
     @foobar.get(@foo_doc['id'])['class'].should == 'hun'
@@ -80,7 +83,7 @@ describe 'migrate all cast scripts inside a directory to the latest version: ' d
   end
 
   it "should update revision" do
-    Migrator.new.migrate_in_dir @res
+    @migrator.migrate_in_dir @res
 
     @foobar.get('caster_foobar')['version'].should == '001'
     @fuubar.get('caster_fuubar')['version'].should == '000'
@@ -93,7 +96,7 @@ describe 'migrate all cast scripts inside a directory to the latest version: ' d
          'version' => '000'
     })
 
-    Migrator.new.migrate_in_dir @res
+    @migrator.migrate_in_dir @res
 
     @foobar.get(@foo_doc['id'])['name'].should == nil
     @foobar.get(@foo_doc['id'])['class'].should == 'hun'

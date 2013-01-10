@@ -1,32 +1,30 @@
 require 'caster/migration'
+require 'caster/metadata/metadata_document'
 require 'couchrest'
 
 module Caster
 
   class Migrator
 
+    def initialize metadata
+      @dbs = {}
+      @metadata = metadata
+    end
+    
     def migrate_in_dir path, migrate_database = nil, max_version = nil
 
-      dbs = {}
       all_migrations = {}
 
       path = path.sub /(\/)+$/, ''
       Dir["#{path}/*.cast"].map do |file|
         migration_version, database = File.basename(file, '.cast').split '.'
 
-        dbs[database] = CouchRest.database! "http://#{Caster.config[:host]}:#{Caster.config[:port]}/#{database}" if dbs[database] == nil
-
-        current_version = nil
-        begin
-          current_version = dbs[database].get("#{Caster.config[:metadoc_id_prefix]}_#{database}")['version']
-        rescue
-          # ignored
-        end
+        @dbs[database] = CouchRest.database! "http://#{Caster.config[:host]}:#{Caster.config[:port]}/#{database}" if @dbs[database] == nil
 
         all_migrations[database] = [] if all_migrations[database] == nil
 
         all_migrations[database] << {
-            :current_version => current_version,
+            :current_version => @metadata.get_db_version(database),
             :version => migration_version,
             :filepath => file
         }
@@ -51,36 +49,24 @@ module Caster
         end.sort
 
         filtered_and_sorted_files.each do |file|
-          migrate_file file, dbs[database]
+          migrate_file file
         end
       end
 
     end
 
-    def migrate_file path, db_handle = nil
+    def migrate_file path
       filename = File.basename path, '.cast'
       version, database = filename.split '.'
+      current_version = @metadata.get_db_version database
 
-      db = db_handle || (CouchRest.database! "http://#{Caster.config[:host]}:#{Caster.config[:port]}/#{database}")
-      metadoc = nil
-      begin
-        metadoc = db.get "#{Caster.config[:metadoc_id_prefix]}_#{database}"
-      rescue
-        metadoc = {
-            '_id' => "#{Caster.config[:metadoc_id_prefix]}_#{database}",
-            'type' => "#{Caster.config[:metadoc_type]}"
-        }
-      end
-
-      if metadoc['version'] != nil and version <= metadoc['version']
+      if current_version != nil and version <= current_version
         raise 'Cannot migrate down!'
       else
-        metadoc['version'] = version
+        migrate_script database, File.open(path).read
+        @metadata.save_db_version database, version
       end
 
-      migrate_script database, File.open(path).read
-
-      db.save_doc metadoc
     end
   end
 end
