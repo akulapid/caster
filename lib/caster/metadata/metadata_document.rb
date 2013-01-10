@@ -7,7 +7,7 @@ module Caster
     def get_db_version database
       db = CouchRest.database! "http://#{Caster.config[:host]}:#{Caster.config[:port]}/#{database}"
       begin
-        return db.get("#{Caster.config[:metadoc_id_prefix]}_#{database}")['version']
+        return db.get("#{Caster.config[:metadata][:id_prefix]}_#{database}")['version']
       rescue
         # ignored
       end
@@ -18,11 +18,11 @@ module Caster
       db = CouchRest.database! "http://#{Caster.config[:host]}:#{Caster.config[:port]}/#{database}"
       metadoc = nil
       begin
-        metadoc = db.get "#{Caster.config[:metadoc_id_prefix]}_#{database}"
+        metadoc = db.get "#{Caster.config[:metadata][:id_prefix]}_#{database}"
       rescue
         metadoc = {
-            '_id' => "#{Caster.config[:metadoc_id_prefix]}_#{database}",
-            'type' => "#{Caster.config[:metadoc_type]}"
+            '_id' => "#{Caster.config[:metadata][:id_prefix]}_#{database}",
+            'type' => "#{Caster.config[:metadata][:type]}"
         }
       end
       metadoc['version'] = version

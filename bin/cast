@@ -12,7 +12,7 @@ class Cast < Thor
   def version
     db = CouchRest.database! "http://#{Caster.config[:host]}:#{Caster.config[:port]}/#{options[:db]}"
     begin
-      puts db.get("#{Caster.config[:metadoc_id_prefix]}_#{database}")['version']
+      puts db.get("#{Caster.config[:metadata][:id_prefix]}_#{database}")['version']
     rescue
       puts "No version information available."
     end
