@@ -5,45 +5,7 @@ module Caster
 
   class Migrator
 
-    def migrate_db_in_dir database, path, max_version = nil
-      db = CouchRest.database! "http://#{Caster.config[:host]}:#{Caster.config[:port]}/#{database}"
-
-      current_version = nil
-      begin
-        current_version = db.get("#{Caster.config[:metadoc_id_prefix]}_#{database}")['version']
-      rescue
-        # ignored
-      end
-
-      path = path.sub /(\/)+$/, ''
-
-      migrations = Dir["#{path}/*.cast"].map do |file|
-        version, db_in_filename = File.basename(file, '.cast').split '.'
-        { :version => version , :database => db_in_filename, :filepath => file }
-      end
-
-      db_filtered = migrations.map do |migration|
-        migration if database == migration[:database]
-      end.compact
-
-      min_version_filtered = db_filtered.map do |migration|
-        migration if current_version == nil or migration[:version] > current_version
-      end.compact
-
-      max_version_filtered = min_version_filtered.map do |migration|
-        migration if max_version == nil or migration[:version] <= max_version
-      end.compact
-
-      filtered_and_sorted_files = max_version_filtered.map do |migration|
-        migration[:filepath]
-      end.sort
-
-      filtered_and_sorted_files.each do |file|
-        migrate_file file, db
-      end
-    end
-
-    def migrate_all_in_dir path
+    def migrate_in_dir path, migrate_database = nil, max_version = nil
 
       dbs = {}
       all_migrations = {}
@@ -72,11 +34,19 @@ module Caster
 
       all_migrations.each_pair do |database, migrations|
 
-        min_version_filtered = migrations.map do |migration|
+        db_filtered = (migrate_database == nil)? migrations.map : migrations.map do |migration|
+          migration if migrate_database == database
+        end.compact
+
+        min_version_filtered = db_filtered.map do |migration|
           migration if migration[:current_version] == nil or migration[:version] > migration[:current_version]
         end.compact
 
-        filtered_and_sorted_files = min_version_filtered.map do |migration|
+        max_version_filtered = min_version_filtered.map do |migration|
+          migration if max_version == nil or migration[:version] <= max_version
+        end.compact
+
+        filtered_and_sorted_files = max_version_filtered.map do |migration|
           migration[:filepath]
         end.sort
 

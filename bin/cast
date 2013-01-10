@@ -22,11 +22,7 @@ class Cast < Thor
   method_option :db, :aliases => '-d'
   method_option :version, :aliases => '-v'
   def up path = '.'
-    if options[:db]
-      Migrator.new.migrate_db_in_dir options[:db], path, options[:version]
-    else
-      Migrator.new.migrate_all_in_dir path
-    end
+    Migrator.new.migrate_in_dir path, options[:db], options[:version]
     puts 'Done.'
   end
 end
