@@ -1,4 +1,5 @@
 require 'yaml'
+require 'logger'
 require 'caster/migration'
 
 include Caster
@@ -13,6 +14,8 @@ module Caster
   }
 
   @valid_config_keys = @config.keys
+
+  @logger = Logger.new STDOUT
 
   def self.configure opts = {}
     opts.each do |k, v|
@@ -37,5 +40,9 @@ module Caster
 
   def self.config
     @config
+  end
+
+  def self.log
+    @logger
   end
 end

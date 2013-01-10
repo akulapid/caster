@@ -56,6 +56,7 @@ module Caster
     end
 
     def execute
+      Caster.log.info "executing query on '#{@db.name}' over '#{@view}' with params #{@query.inspect}"
       rdocs = @db.view(@view, @query)['rows']
       db_docs_map = Hash.new { |k, v| k[v] = [] }
       rdocs.each do |rdoc|
