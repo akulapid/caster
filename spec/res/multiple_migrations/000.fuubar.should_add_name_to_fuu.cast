@@ -1,0 +1,4 @@
+
+over 'fuubar/all_fuu' do
+  add 'name', 'genghis'
+end

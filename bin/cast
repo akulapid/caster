@@ -19,10 +19,14 @@ class Cast < Thor
   end
 
   desc 'up', 'executes migrations defined in cast files in the current directory'
-  method_option :db, :aliases => '-d', :required => true
+  method_option :db, :aliases => '-d'
   method_option :version, :aliases => '-v'
   def up path = '.'
-    Migrator.new.migrate_dir options[:db], path, options[:version]
+    if options[:db]
+      Migrator.new.migrate_db_in_dir options[:db], path, options[:version]
+    else
+      Migrator.new.migrate_all_in_dir path
+    end
     puts 'Done.'
   end
 end

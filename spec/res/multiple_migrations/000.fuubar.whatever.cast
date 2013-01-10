@@ -1,4 +1,0 @@
-
-over 'foobar/all_foo' do
-  add 'oops', 'whatever'
-end

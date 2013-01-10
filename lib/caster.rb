@@ -9,6 +9,8 @@ module Caster
   @config = {
     :host => '127.0.0.1',
     :port => '5984',
+    :use_metadata_db => false,
+    :metadb_name => 'caster_metadb',
     :metadoc_type => 'caster_metadoc',
     :metadoc_id_prefix => 'caster'
   }
