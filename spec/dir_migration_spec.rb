@@ -21,6 +21,7 @@ describe 'migrate specific database inside a directory of assorted cast files: '
     @migrator.migrate_in_dir @res, 'foobar'
 
     @foobar.get('caster_foobar')['version'].should == '001'
+    @foobar.get('caster_foobar')['type'].should == 'caster_metadoc'
   end
 
   it "should not run migration 000 for foobar" do
@@ -107,5 +108,29 @@ describe 'migrate all cast scripts inside a directory to the latest version: ' d
 
   after do
     @fuubar.delete!
+  end
+end
+
+describe "store metadata doc in it's own database: " do
+
+  before do
+    Caster.config[:metadata][:database] = 'caster_metadb'
+
+    @doc = @foobar.save_doc({ 'type' => 'foo' })
+    @res = "#{File.dirname(__FILE__)}/res/multiple_migrations"
+    @migrator = Migrator.new MetadataDocument.new
+  end
+
+  it "should update revision" do
+    @migrator.migrate_in_dir @res, 'foobar'
+
+    @metadb = CouchRest.database! 'http://127.0.0.1:5984/caster_metadb'
+    @metadb.get('caster_foobar')['version'].should == '001'
+    @metadb.get('caster_foobar')['type'].should == 'caster_metadoc'
+  end
+
+  after do
+    @metadb.delete!
+    Caster.config[:metadata][:database] = nil
   end
 end

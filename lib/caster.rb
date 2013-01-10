@@ -10,7 +10,7 @@ module Caster
     :host => '127.0.0.1',
     :port => '5984',
     :metadata => {
-        :target => 'document',
+        :database => nil,
         :id_prefix => 'caster',
         :type => 'caster_metadoc'
     }
