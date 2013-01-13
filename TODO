@@ -4,6 +4,6 @@ before/after hooks for migration
 
 let user define json map instead of metadoc_type in config. metadoc_type fails if user uses a field not named 'type' to filter docs.
 
-batch operations in bulk mode
-
 logs and error messages
+
+parameterize Caster.config usages to avoid using it like a global

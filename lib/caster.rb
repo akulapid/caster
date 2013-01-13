@@ -13,7 +13,8 @@ module Caster
         :database => nil,
         :id_prefix => 'caster',
         :type => 'caster_metadoc'
-    }
+    },
+    :batch_size => 2000,
   }
 
   @valid_config_keys = @config.keys

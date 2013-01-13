@@ -47,19 +47,51 @@ module Caster
 
     def from scope, query = {}
       if scope.scan('/').length == 1
-        return Reference.new @db, scope, query
+        Reference.new @db, scope, query
       else
         database_name, view = scope.split('/', 2)
         db = CouchRest.database "http://#{Caster.config[:host]}:#{Caster.config[:port]}/#{database_name}"
-        return Reference.new db, view, query
+        Reference.new db, view, query
       end
     end
 
     def execute
       Caster.log.info "executing query on '#{@db.name}' over '#{@view}' with params #{@query.inspect}"
-      rdocs = @db.view(@view, @query)['rows']
+
+      limit = @query['limit'] || 1.0/0.0
+      if Caster.config[:batch_size] == nil or limit < Caster.config[:batch_size]
+        execute_batch @db.view(@view, @query)['rows']
+        return
+      end
+
+      @query['limit'] = Caster.config[:batch_size] + 1
+      saved_docs = 0
+      while saved_docs < limit do
+        docs = @db.view(@view, @query)['rows']
+        return if docs.length == 0
+
+        @query['startkey_docid'] = docs.last['id']
+        @query['startkey'] = docs.last['key']
+
+        if docs.length <= Caster.config[:batch_size]
+          execute_batch docs
+          return
+        elsif saved_docs + docs.length - 1 > limit
+          execute_batch docs.slice(0, limit - saved_docs)
+          return
+        else
+          docs.pop
+          execute_batch docs
+          saved_docs += docs.length
+        end
+      end
+    end
+
+    private
+    def execute_batch docs
       db_docs_map = Hash.new { |k, v| k[v] = [] }
-      rdocs.each do |rdoc|
+
+      docs.each do |rdoc|
         doc = rdoc.has_key?('doc')? rdoc['doc'] : rdoc['value']
 
         @operations = []
@@ -68,9 +100,10 @@ module Caster
           db_docs_map[op.db_handle] << op.transformation.execute(doc)
         end
       end
-      db_docs_map.each do |db, docs|
-        db.bulk_save docs
+      db_docs_map.each do |db, db_docs|
+        db.bulk_save db_docs
       end
     end
+
   end
 end
