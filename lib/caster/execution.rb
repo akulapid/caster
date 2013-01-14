@@ -55,23 +55,21 @@ module Caster
         db = CouchRest.database "http://#{Caster.config[:host]}:#{Caster.config[:port]}/#{database_name}"
       end
       key = [scope, query]
-      @ref_docs_cache[key] = db.view(view, query)['rows'].map { |rdoc| rdoc['doc'] || rdoc['value'] } unless @ref_docs_cache.has_key? key
+      @ref_docs_cache[key] = db_query(db, view, query)['rows'].map { |rdoc| rdoc['doc'] || rdoc['value'] } unless @ref_docs_cache.has_key? key
       Reference.new @ref_docs_cache[key]
     end
 
     def execute
-      #Caster.log.info "executing query on '#{@db.name}' over '#{@view}' with params #{@query.inspect}"
-
       limit = @query['limit'] || 1.0/0.0
       if Caster.config[:batch_size] == nil or limit < Caster.config[:batch_size]
-        execute_batch @db.view(@view, @query)['rows']
+        execute_batch db_query(@db, @view, @query)['rows']
         return
       end
 
       @query['limit'] = Caster.config[:batch_size] + 1
       saved_docs = 0
       while saved_docs < limit do
-        docs = @db.view(@view, @query)['rows']
+        docs = db_query(@db, @view, @query)['rows']
         return if docs.length == 0
 
         @query['startkey_docid'] = docs.last['id']
@@ -92,6 +90,11 @@ module Caster
     end
 
     private
+    def db_query db, view, params
+      Caster.log.info { "fetching from '#{db.name}' over '#{view}' with #{params.inspect}" }
+      db.view view, params
+    end
+
     def execute_batch docs
       db_docs_map = Hash.new { |k, v| k[v] = [] }
 
@@ -106,6 +109,7 @@ module Caster
       end
       db_docs_map.each do |db, db_docs|
         db.bulk_save db_docs
+        Caster.log.info { "wrote #{db_docs.length} doc#{(db_docs.length > 1)? 's' : '' } to #{db.name}" }
       end
     end
 

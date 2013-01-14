@@ -20,6 +20,15 @@ module Caster
   @valid_config_keys = @config.keys
 
   @logger = Logger.new STDOUT
+  @logger.level = Logger.const_get((@config.has_key?(:log_level))? @config[:log_level].upcase : 'INFO')
+
+  def self.config
+    @config
+  end
+
+  def self.log
+    @logger
+  end
 
   def self.configure opts = {}
     opts.each do |k, v|
@@ -29,24 +38,14 @@ module Caster
 
   def self.configure_with path_to_yaml_file
     begin
-      config = YAML.load_file path_to_yaml_file
+      configure(YAML.load_file path_to_yaml_file)
     rescue Errno::ENOENT
-      puts "YAML configuration file couldn't be found.. using defaults,\n#{@config.inspect}"
-      return
+      Caster.log.warn { "YAML configuration file couldn't be found.. using defaults" }
     rescue Psych::SyntaxError
-      puts "YAML configuration file contains invalid syntax.. using defaults,\n#{@config.inspect}"
-      return
+      Caster.log.warn { "YAML configuration file contains invalid syntax.. using defaults" }
     end
-    configure(config)
+    Caster.log.info { "using configuration: #{@config.inspect}" }
   end
 
   self.configure_with 'caster.yml'
-
-  def self.config
-    @config
-  end
-
-  def self.log
-    @logger
-  end
 end
