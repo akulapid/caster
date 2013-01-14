@@ -17,6 +17,7 @@ module Caster
       @db = db
       @view = view
       @query = query
+      @ref_docs_cache = {}
       @block = block
     end
 
@@ -47,16 +48,19 @@ module Caster
 
     def from scope, query = {}
       if scope.scan('/').length == 1
-        Reference.new @db, scope, query
+        view = scope
+        db = @db
       else
         database_name, view = scope.split('/', 2)
         db = CouchRest.database "http://#{Caster.config[:host]}:#{Caster.config[:port]}/#{database_name}"
-        Reference.new db, view, query
       end
+      key = [scope, query]
+      @ref_docs_cache[key] = db.view(view, query)['rows'].map { |rdoc| rdoc['doc'] || rdoc['value'] } unless @ref_docs_cache.has_key? key
+      Reference.new @ref_docs_cache[key]
     end
 
     def execute
-      Caster.log.info "executing query on '#{@db.name}' over '#{@view}' with params #{@query.inspect}"
+      #Caster.log.info "executing query on '#{@db.name}' over '#{@view}' with params #{@query.inspect}"
 
       limit = @query['limit'] || 1.0/0.0
       if Caster.config[:batch_size] == nil or limit < Caster.config[:batch_size]

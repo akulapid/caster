@@ -67,3 +67,39 @@ describe 'executing in batch mode: ' do
       end
   end
 end
+
+describe 'refer documents from another database' do
+  before do
+    @fuubar = CouchRest.database! 'http://127.0.0.1:5984/fuubar'
+    @fuubar.save_doc({
+         '_id' => '_design/fuubar',
+         :views => {
+             :all_fuu => {
+                 :map => "function(doc) { if (doc.type == 'fuu') emit (doc._id, doc); }"
+             }
+         }
+    })
+  end
+
+  Caster.config[:batch_size] = 4
+
+  it "should refer and add name" do
+    total_docs = 10
+    (0..total_docs - 1).each do |i|
+      @foobar.save_doc({ 'type' => 'foo', '_id' => i.to_s })
+      @fuubar.save_doc({ 'type' => 'fuu', 'foo_id' => i.to_s, 'name' => "atilla" })
+    end
+
+    over 'foobar/foobar/all_foo' do |doc|
+      add 'name', from('fuubar/fuubar/all_fuu').where{ |src| src['foo_id'] == doc['_id'] }['name']
+    end
+
+    (0..total_docs - 1).each do |i|
+      @foobar.get(i.to_s)['name'].should == "atilla"
+    end
+  end
+
+  after do
+    @fuubar.delete!
+  end
+end

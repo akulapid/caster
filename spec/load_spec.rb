@@ -23,7 +23,7 @@ describe 'migrating large number of documents' do
     end
     @foobar.save_doc({})   # force bulk save
     @foobar.view('foobar/all_foo')  # warm index
-    p "saved #{total_docs} docs."
+    p "saved #{total_docs} docs. starting load test.."
 
     start = Time.now
     over 'foobar/foobar/all_foo' do
@@ -35,6 +35,6 @@ describe 'migrating large number of documents' do
     @foobar.view('foobar/all_foo')['rows'].each do |doc|
       doc['value']['name'].should == 'atilla'
     end
-    p "done."
+    p "load test complete."
   end
 end

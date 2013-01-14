@@ -30,6 +30,24 @@ describe 'refer field from another doc type: ' do
   end
 end
 
+describe 'refer fields from multiple doc types: ' do
+  before do
+    @foo_doc = @foobar.save_doc({ 'type' => 'foo' })
+    @fuu_doc = @foobar.save_doc({ 'type' => 'fuu', 'name' => 'attila', 'foo_id' => @foo_doc['id'] })
+    @fii_doc = @foobar.save_doc({ 'type' => 'fii', 'title' => 'warrior', 'foo_id' => @foo_doc['id'] })
+
+    over 'foobar/foobar/all_foo' do |doc|
+      add 'name', from('foobar/all_fuu').where{ |src| src['foo_id'] == doc['_id'] }['name']
+      add 'title', from('foobar/all_fii').where{ |src| src['foo_id'] == doc['_id'] }['title']
+    end
+  end
+
+  it "should add name and title to foo from the respective fuu and fii" do
+    @foobar.get(@foo_doc['id'])['name'].should == 'attila'
+    @foobar.get(@foo_doc['id'])['title'].should == 'warrior'
+  end
+end
+
 describe 'copy field where the target field is linked by a field nested deep inside: ' do
   before do
     @foo_doc = @foobar.save_doc({ 'type' => 'foo' })
@@ -136,16 +154,16 @@ describe 'refer documents from another database' do
       }
     })
 
-    @foo_doc = @foobar.save_doc({ 'type' => 'foo', 'name' => 'attila'})
-    @fuu_doc = @fuubar.save_doc({ 'type' => 'fuu', 'foo_id' => @foo_doc['id'] })
+    @foo_doc = @foobar.save_doc({ 'type' => 'foo' })
+    @fuu_doc = @fuubar.save_doc({ 'type' => 'fuu', 'foo_id' => @foo_doc['id'], 'name' => 'atilla' })
 
     over 'foobar/foobar/all_foo' do |doc|
-      add 'title', from('fuubar/fuubar/all_fuu').where{ |src| src['foo_id'] == doc['_id'] }
+      add 'name', from('fuubar/fuubar/all_fuu').where{ |src| src['foo_id'] == doc['_id'] }['name']
     end
   end
 
   it "should refer and add name" do
-    @foobar.get(@foo_doc['id'])['name'].should == 'attila'
+    @foobar.get(@foo_doc['id'])['name'].should == 'atilla'
   end
 
   after do
