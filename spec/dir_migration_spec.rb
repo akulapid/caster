@@ -56,7 +56,7 @@ end
 describe 'migrate all cast scripts inside a directory to the latest version: ' do
 
   before do
-    @fuubar = CouchRest.database! 'http://127.0.0.1:5984/fuubar'
+    @fuubar = CouchRest.database! "http://#{Caster.config[:host]}:#{Caster.config[:port]}/fuubar"
     @fuubar.save_doc({
          '_id' => '_design/fuubar',
          :views => {
@@ -124,7 +124,7 @@ describe "store metadata doc in it's own database: " do
   it "should update revision" do
     @migrator.migrate_in_dir @res, 'foobar'
 
-    @metadb = CouchRest.database! 'http://127.0.0.1:5984/caster_metadb'
+    @metadb = CouchRest.database! "http://#{Caster.config[:host]}:#{Caster.config[:port]}/caster_metadb"
     @metadb.get('caster_foobar')['version'].should == '001'
     @metadb.get('caster_foobar')['type'].should == 'caster_metadoc'
   end

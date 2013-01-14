@@ -5,7 +5,7 @@ module Caster
 
     # to enable passing over method calls on the reference through method_missing
     Object.instance_methods.each do |m|
-      undef_method m unless ['__send__', '__id__', 'object_id', 'is_a?'].include? m.to_s
+      undef_method m unless %w(__send__ __id__ object_id is_a?).include? m.to_s
     end
 
     def initialize docs

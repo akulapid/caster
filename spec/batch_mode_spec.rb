@@ -70,7 +70,7 @@ end
 
 describe 'refer documents from another database' do
   before do
-    @fuubar = CouchRest.database! 'http://127.0.0.1:5984/fuubar'
+    @fuubar = CouchRest.database! "http://#{Caster.config[:host]}:#{Caster.config[:port]}/fuubar"
     @fuubar.save_doc({
          '_id' => '_design/fuubar',
          :views => {
