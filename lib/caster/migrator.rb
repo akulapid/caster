@@ -9,6 +9,7 @@ module Caster
     def initialize metadata
       @dbs = {}
       @metadata = metadata
+      Caster.log.info "using #{metadata.desc} for storing metadata documents."
     end
     
     def migrate_in_dir path, migrate_database = nil, max_version = nil

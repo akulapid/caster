@@ -31,10 +31,10 @@ module Caster
     begin
       config = YAML.load_file path_to_yaml_file
     rescue Errno::ENOENT
-      puts "YAML configuration file couldn't be found.. using defaults."
+      puts "YAML configuration file couldn't be found.. using defaults,\n#{@config.inspect}"
       return
     rescue Psych::SyntaxError
-      puts "YAML configuration file contains invalid syntax.. using defaults."
+      puts "YAML configuration file contains invalid syntax.. using defaults,\n#{@config.inspect}"
       return
     end
     configure(config)

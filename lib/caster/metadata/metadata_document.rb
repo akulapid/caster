@@ -4,6 +4,10 @@ module Caster
 
   class MetadataDocument
 
+    def desc
+      'source database'
+    end
+
     def get_db_version database
       db = CouchRest.database! "http://#{Caster.config[:host]}:#{Caster.config[:port]}/#{(Caster.config[:metadata][:database] || database)}"
       begin
