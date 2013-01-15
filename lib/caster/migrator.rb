@@ -1,5 +1,6 @@
 require 'caster/migration'
 require 'caster/metadata/metadata_document'
+require 'caster/metadata/metadata_database'
 require 'couchrest'
 
 module Caster

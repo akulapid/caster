@@ -11,10 +11,13 @@ module Caster
     :port => '5984',
     :metadata => {
         :database => nil,
-        :id_prefix => 'caster',
-        :type => 'caster_metadoc'
+        :design_doc_id => 'caster_meta',
+        :key => {
+            :type => 'caster_metadoc'
+        },
     },
     :batch_size => 2000,
+    :log_level => 'info',
   }
 
   @valid_config_keys = @config.keys

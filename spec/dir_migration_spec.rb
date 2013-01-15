@@ -6,7 +6,7 @@ describe 'migrate specific database inside a directory of assorted cast files: '
   before do
     @doc = @foobar.save_doc({ 'type' => 'foo' })
     @res = "#{File.dirname(__FILE__)}/res/multiple_migrations"
-    @migrator = Migrator.new MetadataDocument.new
+    @migrator = Migrator.new(@metadata = MetadataDocument.new)
   end
 
   it "should run migrations 000, 0001, 001 for foobar" do
@@ -20,15 +20,13 @@ describe 'migrate specific database inside a directory of assorted cast files: '
   it "should update revision" do
     @migrator.migrate_in_dir @res, 'foobar'
 
-    @foobar.get('caster_foobar')['version'].should == '001'
-    @foobar.get('caster_foobar')['type'].should == 'caster_metadoc'
+    @metadata.get_db_version('foobar').should == '001'
   end
 
   it "should not run migration 000 for foobar" do
     @foobar.save_doc({
-         '_id' => 'caster_foobar',
          'type' => 'caster_metadoc',
-         'version' => '000'
+         'foobar' => '000'
     })
 
     @migrator.migrate_in_dir @res, 'foobar'
@@ -71,7 +69,7 @@ describe 'migrate all cast scripts inside a directory to the latest version: ' d
 
     @res = "#{File.dirname(__FILE__)}/res/multiple_migrations"
 
-    @migrator = Migrator.new MetadataDocument.new
+    @migrator = Migrator.new(@metadata = MetadataDocument.new)
   end
 
   it "should run all migrations 000, 0001, 001 for foobar and 000 for fuubar" do
@@ -86,15 +84,14 @@ describe 'migrate all cast scripts inside a directory to the latest version: ' d
   it "should update revision" do
     @migrator.migrate_in_dir @res
 
-    @foobar.get('caster_foobar')['version'].should == '001'
-    @fuubar.get('caster_fuubar')['version'].should == '000'
+    @metadata.get_db_version('foobar').should == '001'
+    @metadata.get_db_version('fuubar').should == '000'
   end
 
   it "should not run migration 000 for foobar; should run for fuubar" do
     @foobar.save_doc({
-         '_id' => 'caster_foobar',
-         'type' => 'caster_metadoc',
-         'version' => '000'
+       'type' => 'caster_metadoc',
+       'foobar' => '000'
     })
 
     @migrator.migrate_in_dir @res
@@ -111,22 +108,73 @@ describe 'migrate all cast scripts inside a directory to the latest version: ' d
   end
 end
 
-describe "store metadata doc in it's own database: " do
+describe "store metadata doc in source database: " do
 
   before do
-    Caster.config[:metadata][:database] = 'caster_metadb'
+    Caster.config[:metadata] = {
+      :design_doc_id => 'caster_meta',
+      :key => {
+          :type => 'caster_metadoc'
+      }
+    }
 
-    @doc = @foobar.save_doc({ 'type' => 'foo' })
+    @foobar.save_doc({ 'type' => 'foo' })
+
     @res = "#{File.dirname(__FILE__)}/res/multiple_migrations"
     @migrator = Migrator.new MetadataDocument.new
+  end
+
+  it "should create metadata design doc" do
+    @migrator.migrate_in_dir @res, 'foobar'
+
+    @foobar.get('_design/caster_meta').should_not == nil
   end
 
   it "should update revision" do
     @migrator.migrate_in_dir @res, 'foobar'
 
+    metadoc = @foobar.view('caster_meta/meta_doc')['rows'][0]['value']
+    metadoc['type'].should == 'caster_metadoc'
+    metadoc['foobar'].should == '001'
+  end
+
+  it "should create only 1 meta_doc" do
+    @migrator.migrate_in_dir @res, 'foobar'
+
+    @foobar.view('caster_meta/meta_doc')['rows'].size.should == 1
+  end
+end
+
+describe "store metadata doc in it's dedicated database: " do
+
+  before do
+    Caster.config[:metadata] = {
+      :database => 'caster_metadb',
+      :design_doc_id => 'caster_meta',
+      :key => {
+          :type => 'caster_metadoc'
+      }
+    }
+
+    @foobar.save_doc({ 'type' => 'foo' })
+
+    @res = "#{File.dirname(__FILE__)}/res/multiple_migrations"
+    @migrator = Migrator.new MetadataDatabase.new
     @metadb = CouchRest.database! "http://#{Caster.config[:host]}:#{Caster.config[:port]}/caster_metadb"
-    @metadb.get('caster_foobar')['version'].should == '001'
-    @metadb.get('caster_foobar')['type'].should == 'caster_metadoc'
+  end
+
+  it "should create metadata design doc" do
+    @migrator.migrate_in_dir @res, 'foobar'
+
+    @metadb.get('_design/caster_meta').should_not == nil
+  end
+
+  it "should update revision" do
+    @migrator.migrate_in_dir @res, 'foobar'
+
+    metadoc = @metadb.view('caster_meta/meta_doc')['rows'][0]['value']
+    metadoc['type'].should == 'caster_metadoc'
+    metadoc['foobar'].should == '001'
   end
 
   after do

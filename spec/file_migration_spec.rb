@@ -5,20 +5,19 @@ describe 'migrate caster script in file: ' do
   before do
     @res = "#{File.dirname(__FILE__)}/res/single_migration/000.foobar.add_name_to_foo.cast"
     @doc = @foobar.save_doc({ 'type' => 'foo' })
-    @migrator = Migrator.new MetadataDocument.new
+    @migrator = Migrator.new(@metadata = MetadataDocument.new)
   end
 
   it "should add metadoc with version" do
     @migrator.migrate_file @res
 
-    @foobar.get('caster_foobar')['version'].should == '000'
+    @metadata.get_db_version('foobar').should == '000'
   end
 
   it "should not migrate to lower version" do
     @foobar.save_doc({
-      '_id' => 'caster_foobar',
-      'type' => 'caster_metadoc',
-      'version' => '001'
+       'type' => 'caster_metadoc',
+       'foobar' => '001'
     })
 
     lambda { @migrator.migrate_file @res }.should raise_exception
@@ -26,14 +25,13 @@ describe 'migrate caster script in file: ' do
 
   it "should update version" do
     @foobar.save_doc({
-        '_id' => 'caster_foobar',
-        'type' => 'caster_metadoc',
-        'version' => '0'
+       'type' => 'caster_metadoc',
+       'foobar' => '0'
     })
 
     @migrator.migrate_file @res
 
-    @foobar.get('caster_foobar')['version'].should == '000'
+    @metadata.get_db_version('foobar').should == '000'
   end
 
   it "should add name all docs in foobar" do
