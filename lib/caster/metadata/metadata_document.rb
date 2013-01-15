@@ -12,12 +12,12 @@ module Caster
     end
 
     def get_db_version database
-      db = CouchRest.database! "http://#{Caster.config[:host]}:#{Caster.config[:port]}/#{database}"
+      db = CouchRest.database! "http://#{Caster.config['host']}:#{Caster.config['port']}/#{database}"
       get_metadoc(db)[db.name] rescue nil
     end
 
     def save_db_version database, version
-      db = CouchRest.database! "http://#{Caster.config[:host]}:#{Caster.config[:port]}/#{database}"
+      db = CouchRest.database! "http://#{Caster.config['host']}:#{Caster.config['port']}/#{database}"
       metadoc = get_metadoc(db)
       metadoc[database] = version
       db.save_doc metadoc

@@ -9,11 +9,11 @@ RSpec.configure do |config|
   config.before :each do
 
     Caster.configure({
-      :host => '127.0.0.1',
-      :port => '5984'
+      'host' => '127.0.0.1',
+      'port' => '5984'
     })
 
-    @foobar = CouchRest.database! "http://#{Caster.config[:host]}:#{Caster.config[:port]}/foobar"
+    @foobar = CouchRest.database! "http://#{Caster.config['host']}:#{Caster.config['port']}/foobar"
 
     @foobar.save_doc({
        '_id' => '_design/foobar',

@@ -7,23 +7,23 @@ include Caster
 module Caster
 
   @config = {
-    :host => '127.0.0.1',
-    :port => '5984',
-    :metadata => {
-        :database => nil,
-        :design_doc_id => 'caster_meta',
-        :key => {
-            :type => 'caster_metadoc'
+    'host' => '127.0.0.1',
+    'port' => '5984',
+    'metadata' => {
+        'database' => nil,
+        'design_doc_id' => 'caster_meta',
+        'key' => {
+            'type' => 'caster_metadoc'
         },
     },
-    :batch_size => 2000,
-    :log_level => 'info',
+    'batch_size' => 2000,
+    'log_level' => 'info',
   }
 
   @valid_config_keys = @config.keys
 
   @logger = Logger.new STDOUT
-  @logger.level = Logger.const_get((@config.has_key?(:log_level))? @config[:log_level].upcase : 'INFO')
+  @logger.level = Logger.const_get((@config.has_key?('log_level'))? @config['log_level'].upcase : 'INFO')
 
   def self.config
     @config
@@ -35,7 +35,7 @@ module Caster
 
   def self.configure opts = {}
     opts.each do |k, v|
-      @config[k.to_sym] = v if @valid_config_keys.include? k.to_sym
+      @config[k] = v if @valid_config_keys.include? k
     end
   end
 

@@ -52,7 +52,7 @@ module Caster
         db = @db
       else
         database_name, view = scope.split('/', 2)
-        db = CouchRest.database "http://#{Caster.config[:host]}:#{Caster.config[:port]}/#{database_name}"
+        db = CouchRest.database "http://#{Caster.config['host']}:#{Caster.config['port']}/#{database_name}"
       end
       key = [scope, query]
       @ref_docs_cache[key] = db_query(db, view, query)['rows'].map { |rdoc| rdoc['doc'] || rdoc['value'] } unless @ref_docs_cache.has_key? key
@@ -61,12 +61,12 @@ module Caster
 
     def execute
       limit = @query['limit'] || 1.0/0.0
-      if Caster.config[:batch_size] == nil or limit < Caster.config[:batch_size]
+      if Caster.config['batch_size'] == nil or limit < Caster.config['batch_size']
         execute_batch db_query(@db, @view, @query)['rows']
         return
       end
 
-      @query['limit'] = Caster.config[:batch_size] + 1
+      @query['limit'] = Caster.config['batch_size'] + 1
       saved_docs = 0
       while saved_docs < limit do
         docs = db_query(@db, @view, @query)['rows']
@@ -75,7 +75,7 @@ module Caster
         @query['startkey_docid'] = docs.last['id']
         @query['startkey'] = docs.last['key']
 
-        if docs.length <= Caster.config[:batch_size]
+        if docs.length <= Caster.config['batch_size']
           execute_batch docs
           return
         elsif saved_docs + docs.length - 1 > limit

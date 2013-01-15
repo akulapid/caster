@@ -4,7 +4,7 @@ describe 'migrating large number of documents' do
 
   it "should add name" do
     total_docs = 10#0000
-    Caster.config[:batch_size] = 10000
+    Caster.config['batch_size'] = 10000
 
     (0..total_docs - 1).each do |i|
       @foobar.save_doc({

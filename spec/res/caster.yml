@@ -1,0 +1,9 @@
+host: 127.0.0.1
+port: 5984
+metadata:
+  database:
+  design_doc_id: caster_meta
+  key:
+    type: caster_metadoc
+batch_size: 2000
+log_level: warn

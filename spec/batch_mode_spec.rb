@@ -8,7 +8,7 @@ describe 'executing in batch mode: ' do
         @foobar.save_doc({ 'type' => 'foo', '_id' => i.to_s })
       end
 
-      Caster.config[:batch_size] = 3
+      Caster.config['batch_size'] = 3
 
       over 'foobar/foobar/all_foo' do
         add 'name', 'atilla'
@@ -28,7 +28,7 @@ describe 'executing in batch mode: ' do
         @foobar.save_doc({ 'type' => 'foo', '_id' => i.to_s })
       end
 
-      Caster.config[:batch_size] = 3
+      Caster.config['batch_size'] = 3
 
       over 'foobar/foobar/all_foo', { 'limit' => limit } do
         add 'name', 'atilla'
@@ -50,7 +50,7 @@ describe 'executing in batch mode: ' do
         @foobar.save_doc({ 'type' => 'foo', '_id' => i.to_s })
       end
 
-      Caster.config[:batch_size] = 2
+      Caster.config['batch_size'] = 2
 
       over 'foobar/foobar/all_foo', { 'startkey' => '4', 'endkey' => '7' } do
         add 'name', 'atilla'
@@ -70,7 +70,7 @@ end
 
 describe 'refer documents from another database' do
   before do
-    @fuubar = CouchRest.database! "http://#{Caster.config[:host]}:#{Caster.config[:port]}/fuubar"
+    @fuubar = CouchRest.database! "http://#{Caster.config['host']}:#{Caster.config['port']}/fuubar"
     @fuubar.save_doc({
          '_id' => '_design/fuubar',
          :views => {
@@ -81,7 +81,7 @@ describe 'refer documents from another database' do
     })
   end
 
-  Caster.config[:batch_size] = 4
+  Caster.config['batch_size'] = 4
 
   it "should refer and add name" do
     total_docs = 10

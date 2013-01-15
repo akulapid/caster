@@ -3,7 +3,7 @@ require 'caster/execution'
 module Caster
 
   def migrate database_name, &block
-    @db = CouchRest.database "http://#{Caster.config[:host]}:#{Caster.config[:port]}/#{database_name}"
+    @db = CouchRest.database "http://#{Caster.config['host']}:#{Caster.config['port']}/#{database_name}"
     yield
     @db = nil
   end
@@ -16,7 +16,7 @@ module Caster
 
   def over scope, query = {}, &block
     database_name, view = split_view_accessor(scope)
-    db = CouchRest.database "http://#{Caster.config[:host]}:#{Caster.config[:port]}/#{database_name}" if @db == nil
+    db = CouchRest.database "http://#{Caster.config['host']}:#{Caster.config['port']}/#{database_name}" if @db == nil
     Execution.new(db || @db, view, query, &block).execute
   end
 

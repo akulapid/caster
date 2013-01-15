@@ -24,7 +24,7 @@ module Caster
       cast_files.map do |file|
         migration_version, database = File.basename(file, '.cast').split '.'
 
-        @dbs[database] = CouchRest.database! "http://#{Caster.config[:host]}:#{Caster.config[:port]}/#{database}" if @dbs[database] == nil
+        @dbs[database] = CouchRest.database! "http://#{Caster.config['host']}:#{Caster.config['port']}/#{database}" if @dbs[database] == nil
 
         all_migrations[database] = [] if all_migrations[database] == nil
 

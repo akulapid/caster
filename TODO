@@ -9,3 +9,7 @@ parameterize Caster.config usages to avoid using it like a global
 cache db handles globally
 
 support writing into sql database
+
+cast version should take metadata config
+
+disable logging for `cast version`

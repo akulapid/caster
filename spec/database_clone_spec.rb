@@ -3,9 +3,9 @@ require 'spec_helper'
 describe 'copy documents between databases: ' do
   before do
     @doc1 = @foobar.save_doc({ 'type' => 'foo' })
-    @fuubar = CouchRest.database! "http://#{Caster.config[:host]}:#{Caster.config[:port]}/fuubar"
+    @fuubar = CouchRest.database! "http://#{Caster.config['host']}:#{Caster.config['port']}/fuubar"
 
-    fuubar = CouchRest.database! "http://#{Caster.config[:host]}:#{Caster.config[:port]}/fuubar"
+    fuubar = CouchRest.database! "http://#{Caster.config['host']}:#{Caster.config['port']}/fuubar"
 
     over 'foobar/foobar/all_foo' do |doc|
       create_on(fuubar, doc)

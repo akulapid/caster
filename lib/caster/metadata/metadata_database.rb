@@ -8,7 +8,7 @@ module Caster
     include Caster::MetadataStore
 
     def initialize
-      @metadb = CouchRest.database! "http://#{Caster.config[:host]}:#{Caster.config[:port]}/#{Caster.config[:metadata][:database]}"
+      @metadb = CouchRest.database! "http://#{Caster.config['host']}:#{Caster.config['port']}/#{Caster.config['metadata']['database']}"
     end
 
     def desc
